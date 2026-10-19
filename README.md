@@ -1,5 +1,7 @@
 # 📝 TomaNota AI
 
+🚀 **[Abrir TomaNota AI en el navegador (GitHub Pages)](https://canariasmedcalc/tomanota-ai/)** | 📦 **[Descargar versión offline (.ZIP)](https://github.com/olivercabello/tomanota-ai/archive/refs/heads/main.zip)**
+
 Aplicación web en un único archivo HTML para grabar, transcribir y generar actas de reuniones mediante la API de Google Gemini. Funciona 100% en local desde el navegador, sin servidores intermedios ni bots en las salas de videoconferencia.
 
 Desarrollado por **Oliver Cabello** y **Alejandro Jara**.
