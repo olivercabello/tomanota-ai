@@ -64,13 +64,14 @@ Para reuniones muy largas cuyo audio supere los 14.5 MB, la Files API de Google 
    ```bash
    python -m http.server 8000
 
----
+````
 
+---
 ## Privacidad y aviso legal
 
 - Esta herramienta ejecuta la captura en tu propio navegador y se comunica directamente con la API oficial de Google Gemini usando tu clave personal. Los autores no recopilan, almacenan ni tienen acceso a las grabaciones, transcripciones o claves utilizadas. Asegúrate de contar con el consentimiento de los participantes antes de grabar cualquier sesión.
 
---
+---
 
 ## Licencia
 
