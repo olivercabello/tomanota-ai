@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📝 TomaNota AI v7.4 - Grabador & Analizador de Reuniones</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js" defer></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --warning: #d97706;
+      --warning-hover: #b45309;
+      --success: #16a34a;
+      --success-hover: #15803d;
+      --accent: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 2rem 1rem; display: flex; justify-content: center; min-height: 100vh; flex-direction: column; align-items: center; }
+    .container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 1.5rem; flex: 1; }
+    
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+    h1 { font-size: 1.45rem; margin-bottom: 0.4rem; }
+    p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.45; }
+
+    .input-group { margin-top: 0.85rem; display: flex; flex-direction: column; gap: 0.35rem; }
+    label { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem; }
+    input[type="password"], input[type="text"], input[type="file"], select, textarea {
+      width: 100%; padding: 0.6rem 0.85rem; border-radius: 8px; border: 1px solid var(--border);
+      background: #0b1120; color: var(--text); outline: none; font-size: 0.92rem;
+    }
+    textarea {
+      min-height: 100px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem; line-height: 1.5; resize: vertical;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+
+    .grid-config { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.85rem; margin-top: 0.5rem; }
+
+    .actions { display: flex; gap: 0.65rem; flex-wrap: wrap; margin-top: 1.2rem; align-items: center; }
+    button {
+      padding: 0.7rem 1.15rem; border-radius: 8px; font-weight: 600; cursor: pointer; border: none;
+      display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; transition: background 0.15s ease;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: var(--danger-hover); }
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-warning:hover { background: var(--warning-hover); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: var(--success-hover); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { background: #334155; }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.78rem; border-radius: 6px; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .status-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.85rem; }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.84rem; font-weight: 500;
+      padding: 0.3rem 0.8rem; border-radius: 9999px; background: #334155;
+    }
+    .status-indicator { width: 8px; height: 8px; border-radius: 50%; background: #64748b; }
+    .recording .status-indicator { background: var(--danger); animation: pulse 1s infinite; }
+    .recording { color: #fca5a5; }
+    .paused .status-indicator { background: var(--warning); }
+    .paused { color: #fde68a; }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .metrics-bar {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem;
+      background: #0b1120; border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem;
+      margin-top: 1rem; font-size: 0.85rem;
+    }
+    .metric-item span { display: block; color: var(--text-muted); font-size: 0.75rem; }
+    .metric-item strong { color: var(--text); font-size: 0.92rem; }
+
+    #output-area { margin-top: 1rem; }
+    .markdown-body {
+      background: #0b1120; border: 1px solid var(--border); border-radius: 8px;
+      padding: 1.25rem; font-size: 0.94rem; line-height: 1.6; color: #cbd5e1;
+      max-height: 550px; overflow-y: auto;
+    }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--text); margin-top: 1rem; margin-bottom: 0.5rem; }
+    .markdown-body ul { padding-left: 1.25rem; margin-bottom: 0.5rem; }
+    .markdown-body code { background: #1e293b; padding: 0.2rem 0.4rem; border-radius: 4px; }
+    .markdown-body blockquote { border-left: 3px solid var(--primary); padding-left: 0.85rem; color: #e2e8f0; margin: 0.5rem 0; }
+
+    .rescue-box {
+      background: #1e1b4b; border: 1px solid #4338ca; border-radius: 8px; padding: 1rem;
+      margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
+    }
+
+    .granola-box {
+      background: #0b1528; border: 1px solid var(--accent); border-radius: 10px; padding: 1.1rem;
+      margin-top: 1rem;
+    }
+
+    .panel-section {
+      margin-top: 1.1rem; padding-top: 1rem; border-top: 1px solid var(--border);
+    }
+
+    .banner {
+      padding: 0.8rem 1rem; border-radius: 8px; margin-top: 0.85rem; font-size: 0.88rem; line-height: 1.4;
+    }
+    .banner-error { background: #450a0a; border: 1px solid #dc2626; color: #fecaca; }
+    .banner-warn { background: #451a03; border: 1px solid #d97706; color: #fde68a; }
+    .banner-ok { background: #052e16; border: 1px solid #16a34a; color: #bbf7d0; }
+
+    footer {
+      width: 100%;
+      max-width: 900px;
+      margin-top: 2rem;
+      padding: 1.25rem 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- MODAL DE ACCESO / LLAVE API -->
+  <div id="auth-card" class="card">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+      <div style="background: #0f172a; border: 1px solid #3b82f6; border-radius: 12px; padding: 0.6rem; display: flex; align-items: center; justify-content: center;">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v3"></path>
+          <circle cx="12" cy="2" r="1" fill="#3b82f6"></circle>
+          <rect x="4" y="5" width="16" height="13" rx="3" fill="#1e293b"></rect>
+          <circle cx="9" cy="10" r="1.5" fill="#60a5fa"></circle>
+          <circle cx="15" cy="10" r="1.5" fill="#60a5fa"></circle>
+          <path d="M9 14h6"></path>
+          <path d="M19 19l-3-3"></path>
+          <path d="M21 17l-4.5-4.5"></path>
+        </svg>
+      </div>
+      <div>
+        <h1 style="font-size: 1.5rem;">TomaNota AI</h1>
+        <p style="font-size: 0.85rem;">Configuración de Google Gemini API (Edición Estable v7.4)</p>
+      </div>
+    </div>
+    <p>Introduce tu clave de Google AI Studio. Se validará y guardará localmente en tu navegador.</p>
+
+    <div class="input-group" style="margin-top: 1rem;">
+      <label for="api-key-gemini">Gemini API Key</label>
+      <input type="password" id="api-key-gemini" placeholder="Pega aquí tu API Key (AIzaSy... o AQ...)" onkeydown="if(event.key==='Enter') handleLoginClick()">
+    </div>
+
+    <div id="auth-error" class="banner banner-error hidden"></div>
+
+    <div class="actions">
+      <button type="button" class="btn-primary" id="btn-login" onclick="handleLoginClick()">Validar y Entrar</button>
+      <span id="js-ready-indicator" style="font-size: 0.78rem; color: #4ade80;"></span>
+    </div>
+  </div>
+
+  <!-- INTERFAZ PRINCIPAL -->
+  <div id="app-card" class="card hidden">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <div style="background: #0f172a; border: 1px solid #3b82f6; border-radius: 12px; padding: 0.6rem; display: flex; align-items: center; justify-content: center;">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v3"></path>
+            <circle cx="12" cy="2" r="1" fill="#3b82f6"></circle>
+            <rect x="4" y="5" width="16" height="13" rx="3" fill="#1e293b"></rect>
+            <circle cx="9" cy="10" r="1.5" fill="#60a5fa"></circle>
+            <circle cx="15" cy="10" r="1.5" fill="#60a5fa"></circle>
+            <path d="M9 14h6"></path>
+            <path d="M19 19l-3-3"></path>
+            <path d="M21 17l-4.5-4.5"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 style="display: flex; align-items: center; gap: 0.5rem;">
+            TomaNota AI <span style="font-size: 0.75rem; background: var(--success); color: white; padding: 0.1rem 0.45rem; border-radius: 6px;">v7.4 Estable</span>
+          </h1>
+          <p>Captura de bajo consumo (16 kbps), autoguardado incremental en disco, MP3 ligero y soporte Obsidian.</p>
+        </div>
+      </div>
+      <button type="button" class="btn-outline btn-sm" id="btn-logout" onclick="handleLogoutClick()">Cambiar API Key</button>
+    </div>
+
+    <!-- SELECTORES DE MODELO Y FUENTE DE AUDIO -->
+    <div class="grid-config">
+      <div class="input-group">
+        <label for="model-selector">
+          <span>Modelo de Gemini:</span>
+          <button type="button" class="btn-outline btn-sm" id="btn-refresh-models" style="padding: 0.15rem 0.5rem; font-size: 0.74rem;">↻ Sincronizar lista</button>
+        </label>
+        <select id="model-selector"></select>
+      </div>
+      <div class="input-group">
+        <label for="capture-mode">Fuente de Grabación:</label>
+        <select id="capture-mode">
+          <option value="dual">Sistema/Pestaña + Mi Micrófono</option>
+          <option value="system">Solo Audio de Reunión (Sin Micrófono)</option>
+          <option value="mic">Solo Mi Micrófono (Reunión presencial)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- PANEL DE CONTEXTO Y NOTAS EN DIRECTO -->
+    <div class="granola-box">
+      <div class="input-group" style="margin-top: 0;">
+        <label for="meeting-attendees">Contexto adicional / Unidades o Asistentes previstos (opcional):</label>
+        <input type="text" id="meeting-attendees" placeholder="Ej: Centro, Gerencia, Proveedor, nombres para Action Items...">
+      </div>
+      <div class="input-group" style="margin-top: 0.75rem;">
+        <label for="live-notes">
+          <span>Notas rápidas tomadas durante la llamada (Compatibles con formato Callout `> `):</span>
+          <button type="button" class="btn-outline btn-sm" id="btn-clear-notes" style="padding: 0.1rem 0.45rem; font-size: 0.72rem;">Limpiar notas</button>
+        </label>
+        <textarea id="live-notes" style="min-height: 80px;" placeholder="Apunta siglas, decisiones clave o tareas sobre la marcha. La IA las priorizará al redactar el acta..."></textarea>
+      </div>
+    </div>
+
+    <div class="status-row">
+      <div class="status-badge" id="status-container">
+        <div class="status-indicator"></div>
+        <span id="status-text">Listo</span>
+      </div>
+      <div class="status-badge hidden" id="signal-badge">
+        <span id="signal-text">Señal: -</span>
+      </div>
+    </div>
+
+    <div id="warn-banner" class="banner banner-warn hidden"></div>
+    <div id="error-banner" class="banner banner-error hidden"></div>
+    <div id="ok-banner" class="banner banner-ok hidden"></div>
+
+    <!-- ACCIONES PRINCIPALES -->
+    <div class="actions">
+      <button type="button" class="btn-primary" id="btn-start">Iniciar Grabación</button>
+      <button type="button" class="btn-warning hidden" id="btn-pause">Pausar</button>
+      <button type="button" class="btn-danger hidden" id="btn-stop">Detener y Procesar</button>
+      <button type="button" class="btn-outline" id="btn-toggle-upload">Subir Archivo (.CSV / .TXT / .MD / Audio)</button>
+      <button type="button" class="btn-outline" id="btn-toggle-prompt">Configurar Prompt</button>
+    </div>
+
+    <!-- SECCIÓN DE SUBIDA DE ARCHIVOS -->
+    <div id="upload-section" class="panel-section hidden">
+      <label for="file-input" style="margin-bottom: 0.4rem;">Seleccionar Transcripción (.csv de LiveCaptions, .txt, .md) o Grabación de Audio (.webm, .mp3, .wav, .m4a, .ogg):</label>
+      <input type="file" id="file-input" accept="audio/*,.txt,.md,.csv,text/plain,text/csv,text/markdown">
+      <div class="actions" style="margin-top: 0.6rem;">
+        <button type="button" class="btn-primary" id="btn-process-file">Analizar Archivo Subido</button>
+      </div>
+    </div>
+
+    <!-- SECCIÓN DE EDICIÓN DE PROMPT -->
+    <div id="prompt-section" class="panel-section hidden">
+      <label for="prompt-textarea" style="margin-bottom: 0.4rem;">
+        <span>Prompt del Sistema (Usa <code>{{FECHA}}</code> para insertar la fecha actual):</span>
+        <div style="display: flex; gap: 0.4rem;">
+          <button type="button" class="btn-outline btn-sm" id="btn-preset-scs">Cargar Plantilla (Obsidian Callout)</button>
+          <button type="button" class="btn-outline btn-sm" id="btn-preset-yaml">Cargar Plantilla Estándar (YAML)</button>
+        </div>
+      </label>
+      <textarea id="prompt-textarea" style="min-height: 260px;"></textarea>
+      <div class="actions" style="margin-top: 0.6rem;">
+        <button type="button" class="btn-primary" id="btn-save-prompt">Guardar Prompt como Predeterminado</button>
+      </div>
+    </div>
+
+    <!-- CAJA DE RESCATE Y EXPORTACIÓN MP3 -->
+    <div id="rescue-box" class="rescue-box hidden">
+      <div>
+        <strong style="color: #c7d2fe;" id="rescue-title">Grabación protegida en disco local:</strong>
+        <p style="font-size: 0.84rem; color: #a5b4fc;" id="rescue-info">Tamaño: 0 MB</p>
+      </div>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button type="button" class="btn-warning" id="btn-download-audio">Descargar Original (.webm)</button>
+        <button type="button" class="btn-success" id="btn-download-mp3">Convertir a MP3 (16 kHz)</button>
+        <button type="button" class="btn-primary" id="btn-retry-ai">Procesar con Gemini</button>
+        <button type="button" class="btn-outline btn-sm" id="btn-clear-rescue">Limpiar</button>
+      </div>
+    </div>
+
+    <!-- PANEL DE MÉTRICAS -->
+    <div id="metrics-panel" class="metrics-bar hidden">
+      <div class="metric-item">
+        <span>Modelo utilizado</span>
+        <strong id="metric-model">-</strong>
+      </div>
+      <div class="metric-item">
+        <span>Tamaño / Origen</span>
+        <strong id="metric-size">-</strong>
+      </div>
+      <div class="metric-item">
+        <span>Duración / Volumen</span>
+        <strong id="metric-duration">-</strong>
+      </div>
+      <div class="metric-item">
+        <span>Tiempo de Proceso</span>
+        <strong id="metric-latency">-</strong>
+      </div>
+    </div>
+
+    <!-- ÁREA DE RESULTADOS -->
+    <div id="output-area" class="hidden">
+      <hr style="border-color: var(--border); margin: 1.5rem 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+        <h2>Ficha de la Reunión</h2>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn-outline" id="btn-copy">Copiar MD</button>
+          <button type="button" class="btn-outline" id="btn-download">Descargar .md</button>
+        </div>
+      </div>
+      <div class="markdown-body" id="markdown-render"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p><strong>TomaNota AI v7.4</strong> — Desarrollado por <strong>Oliver Cabello</strong> & <strong>Alejandro Jara</strong> | <a href="https://github.com/olivercabello/tomanota-ai" target="_blank" rel="noopener noreferrer">Repositorio en GitHub</a></p>
+  <p style="font-size: 0.75rem; color: #64748b; max-width: 700px; margin: 0 auto;">
+    <em>Disclaimer:</em> Esta herramienta procesa audio y texto localmente mediante la API de Google Gemini utilizando tu propia clave personal. Los autores no almacenan, recopilan ni tienen acceso a ninguna grabación, transcripción o clave introducida en la aplicación.
+  </p>
+</footer>
+
+<script>
+  const jsIndicator = document.getElementById('js-ready-indicator');
+  if (jsIndicator) jsIndicator.innerText = '✓ Motor JS activo';
+
+  // ============================================================================
+  // 1. ALMACENAMIENTO SEGURO CON TRIPLE FALLBACK (LOCAL -> SESSION -> MEMORIA)
+  // ============================================================================
+  const memoryFallback = {};
+  const safeStorage = {
+    getItem: function(key) {
+      try {
+        const v = window.localStorage.getItem(key);
+        if (v !== null) return v;
+      } catch (e) {}
+      try {
+        const v2 = window.sessionStorage.getItem(key);
+        if (v2 !== null) return v2;
+      } catch (e2) {}
+      return memoryFallback[key] !== undefined ? memoryFallback[key] : null;
+    },
+    setItem: function(key, val) {
+      memoryFallback[key] = String(val);
+      try { window.localStorage.setItem(key, val); } catch (e) {}
+      try { window.sessionStorage.setItem(key, val); } catch (e2) {}
+    },
+    removeItem: function(key) {
+      delete memoryFallback[key];
+      try { window.localStorage.removeItem(key); } catch (e) {}
+      try { window.sessionStorage.removeItem(key); } catch (e2) {}
+    }
+  };
+
+  const STORAGE_KEYS = {
+    API_KEY: 'transcriptor_gemini_api_key',
+    SELECTED_MODEL: 'transcriptor_gemini_selected_model',
+    CACHED_MODELS: 'transcriptor_gemini_models_cache',
+    CUSTOM_PROMPT: 'transcriptor_gemini_custom_prompt',
+    CAPTURE_MODE: 'transcriptor_capture_mode',
+    LIVE_NOTES: 'transcriptor_live_notes',
+    ATTENDEES: 'transcriptor_attendees'
+  };
+
+  // Modelos reales vigentes en la API oficial de Google AI Studio
+  const FALLBACK_MODELS = [
+    { id: 'gemini-2.5-flash', displayName: 'Gemini 2.5 Flash (Recomendado)', outputTokenLimit: 65536 },
+    { id: 'gemini-2.5-pro', displayName: 'Gemini 2.5 Pro (Análisis profundo)', outputTokenLimit: 65536 },
+    { id: 'gemini-2.0-flash', displayName: 'Gemini 2.0 Flash', outputTokenLimit: 8192 }
+  ];
+
+  // Plantilla predeterminada: Especializada en Sistemas de Información Sanitaria (SCS) + Callout Obsidian
+  const PROMPT_SCS_OBSIDIAN = [
+    "Eres un analista técnico de primer nivel especializado en procesar grabaciones de audio y depurar transcripciones automáticas en crudo de reuniones sobre sistemas de información sanitaria e historia clínica electrónica (HCE). Tu objetivo es consolidar actas de reuniones e informes operativos en una única ejecución (one-shot) con un nivel de precisión técnica absoluto, aplicando un enfoque proactivo que anticipe problemas y evite cualquier ambigüedad en el sector salud.",
+    "",
+    "Aplica estrictamente las siguientes reglas en tu flujo de trabajo:",
+    "",
+    "### 1. REGLA CERO: FLUJO CONTINUO, NEUTRALIDAD E IMPERSONALIDAD",
+    "- Los identificadores de interlocutor en transcripciones previas (Speaker 0, Speaker 1, nombres propios asignados automáticamente, etc.) o las voces solapadas en llamadas multitudinarias suelen inducir a error. Ignora las etiquetas de hablante defectuosas y analiza el contenido como un flujo de información técnico continuo.",
+    "- Redacta en formato estrictamente impersonal (\"Se evaluó...\", \"Se determinó...\", \"Se planteó la necesidad de...\"), absteniéndote de atribuir opiniones o decisiones a personas concretas salvo que se explicite de forma inequívoca la asignación de una tarea.",
+    "- Trata el contenido con estricta neutralidad factual, omitiendo cualquier preámbulo, saludo, cierre, lenguaje motivacional o valoraciones subjetivas. Ve directamente al grano.",
+    "",
+    "### 2. REGLA DE LENGUAJE Y ENTORNO SANITARIO",
+    "- Adopta un perfil lingüístico basado en la norma culta del español de Canarias. Aplica estrictamente el uso exclusivo de 'ustedes' (eliminando el voseo, 'vosotros' y sus conjugaciones). Utiliza preferentemente el Pretérito Perfecto Simple ('se acordó', 'se revisó', 'se planteó') frente al compuesto, salvo inmediatez estricta.",
+    "- Todo el análisis debe estar enfocado y contextualizado en la operativa y arquitectura del sistema sanitario español, y específicamente del Servicio Canario de la Salud (SCS), sus gerencias, centros y aplicativos.",
+    "",
+    "### 3. REGLA DE AUDITORÍA FONÉTICA E INCERTIDUMBRE (MODO EJECUCIÓN ÚNICA)",
+    "- Si procesas audio o texto con posibles errores de reconocimiento fonético (términos técnicos, estándares como HL7/FHIR/DICOM, nombres de módulos de HCE, hospitales o proveedores mal transcritos), corrígelos aplicando inferencia lógica basada en el contexto sanitario solo cuando la certeza sea alta (incertidumbre <= 0.1).",
+    "- Si detectas acrónimos no definidos, términos fonéticamente dudosos o ambigüedades críticas en acuerdos o responsabilidades cuya incertidumbre supere el 0.1, NO inventes ni asumas su significado: márcalos en el texto con `[¿término?]` y desglósalos obligatoriamente en la sección final de auditoría del acta.",
+    "",
+    "### 4. FORMATO DE SALIDA: OBSIDIAN CALLOUT ESTRICTO",
+    "- Devuelve ÚNICAMENTE el bloque del callout de Obsidian, sin texto introductorio ni bloques de código envolventes adicionales.",
+    "- REGLA DE ORO DE FORMATO: Cada línea de la respuesta (absolutamente todas, incluidas las líneas vacías de separación) DEBE comenzar con el prefijo `> ` para que Obsidian mantenga la integridad visual del bloque.",
+    "- Usa Markdown estándar (negritas, listas). Reserva LaTeX única y exclusivamente para fórmulas matemáticas o científicas complejas; nunca lo utilices para unidades simples, porcentajes o prosa ordinaria.",
+    "",
+    "Sigue EXACTAMENTE esta estructura:",
+    "",
+    "> [!NOTE] Transcripción resumida Reunión: [Título conciso de la Reunión o Sistemas Evaluados]",
+    "> **Fecha de Análisis:** {{FECHA}}",
+    "> **Centros / Ámbitos implicados:** [Gerencias, hospitales, centros de salud, servicios o áreas técnicas mencionadas. Si no se especifican, indicar \"No especificados\"]",
+    "> ",
+    "> ### Objetivo y Contexto Operativo (Teletipo)",
+    "> [Párrafo directo de 3 a 5 líneas, estilo cable de agencia y sin preámbulos, resumiendo el propósito central de la sesión, los sistemas afectados y el resultado global].",
+    "> ",
+    "> ---",
+    "> ",
+    "> ### Puntos críticos analizados y Arquitectura",
+    "> * [Problema, flujo clínico/administrativo o requerimiento técnico discutido en formato estrictamente impersonal: \"Se evaluó el impacto de...\", \"Se expuso la limitación en...\"].",
+    "> * [Análisis proactivo: si durante la sesión se evidencian cuellos de botella, riesgos de integración, debilidades de diseño o dependencias no resueltas, documéntalos de forma crítica y objetiva].",
+    "> ",
+    "> ---",
+    "> ",
+    "> ### Acuerdos técnicos y funcionales",
+    "> * [Decisión en firme adoptada. Si no se alcanzaron acuerdos cerrados en algún punto, indícalo expresamente sin extrapolar].",
+    "> ",
+    "> ---",
+    "> ",
+    "> ### Tareas pendientes (Action Items)",
+    "> - [ ] [Descripción clara, accionable y concisa de la tarea]. **[Responsable: Nombre/Rol o Unidad]** *(o **[Responsable por asignar]** si no quedó definido explícitamente)*.",
+    "> ",
+    "> ---",
+    "> ",
+    "> ### Notas rápidas de sesión",
+    "> * [Si el usuario proporcionó apuntes manuales durante la llamada, intégralos y verifícalos aquí. Si no proporcionó notas, indicar \"Sin notas manuales registradas\"].",
+    "> ",
+    "> ---",
+    "> ",
+    "> ### ⚠️ Auditoría de Incertidumbre y Términos por Verificar (Incertidumbre > 0.1)",
+    "> * [Lista estructurada de acrónimos sin definir, posibles errores fonéticos de transcripción y ambigüedades pendientes de aclaración. Si toda la sesión fue técnicamente unívoca y la incertidumbre es <= 0.1, indicar: \"Sin ambigüedades críticas ni términos fonéticos dudosos detectados\"]."
+  ].join("\n");
+
+  const PROMPT_STANDARD_YAML = [
+    "Eres un analista experto en secretaría técnica y gestión de proyectos.",
+    "A partir de la transcripción, grabación y las notas suministradas, genera un reporte estructurado y riguroso.",
+    "",
+    "Sigue EXACTAMENTE esta estructura en Markdown:",
+    "",
+    "---",
+    "titulo: \"[Título conciso y representativo de la sesión]\"",
+    "fecha: {{FECHA}}",
+    "duracion_estimada: \"[Duración o volumen aproximado]\"",
+    "asistentes:",
+    "  - \"[Nombre o Interviniente]\"",
+    "etiquetas: [reunion, seguimiento, proyecto]",
+    "---",
+    "",
+    "# Ficha Ejecutiva",
+    "",
+    "## TELETIPO (Resumen Ejecutivo)",
+    "[Párrafo breve de 3 a 5 líneas con estilo de cable de agencia o teletipo de noticias: directo, sin preámbulos, enfocado en el hecho principal y los resultados centrales alcanzados].",
+    "",
+    "## Intervinientes y Roles",
+    "- **[Nombre / Interviniente]**: [Cargo, rol o aportación clave]",
+    "",
+    "## Centros / Dependencias Implicadas",
+    "[Lista de centros de trabajo, hospitales, administraciones, sedes o dependencias mencionadas. Si no se especifican, indicar \"No especificados\"].",
+    "",
+    "## Puntos Clave",
+    "- [Punto clave o posicionamiento 1]",
+    "- [Punto clave o posicionamiento 2]",
+    "",
+    "## Acuerdos Firmes",
+    "- [Acuerdo formalizado 1. Si no hubo acuerdos en firme, indícalo expresamente sin inventar].",
+    "",
+    "## Tareas Pendientes (Action Items)",
+    "- [ ] **[Responsable]**: [Tarea concreta a ejecutar con plazo si se indica]",
+    "",
+    "## Notas Rápidas del Usuario (Apuntes de Sesión)",
+    "[Si el usuario proporcionó notas rápidas tomadas durante la sesión, intégralas aquí de forma estructurada. Si no proporcionó notas, indica \"Sin notas manuales registradas\"].",
+    "",
+    "---",
+    "",
+    "# Crónica Cronológica / Diarizada de Intervenciones",
+    "",
+    "**[HH:MM:SS] [Speaker/Nombre]:** [Intervención depurada y fiel]"
+  ].join("\n");
+
+  const DEFAULT_PROMPT_TEMPLATE = PROMPT_SCS_OBSIDIAN;
+
+  // ============================================================================
+  // 2. MOTOR INDEXEDDB INCREMENTAL O(1) CON CONEXIÓN SINGLETON
+  // ============================================================================
+  const DB_NAME = 'TomaNotaAiDB_v2';
+  const STORE_NAME = 'fragmentos_audio';
+  const META_KEY = 'meta_sesion';
+  let dbInstancePromise = null;
+
+  function getBackupDB() {
+    if (dbInstancePromise) return dbInstancePromise;
+    dbInstancePromise = new Promise((resolve) => {
+      let resolved = false;
+      const done = (val) => {
+        if (!resolved) {
+          resolved = true;
+          if (!val) dbInstancePromise = null;
+          resolve(val);
+        }
+      };
+      setTimeout(() => done(null), 1500);
+      try {
+        if (!window.indexedDB) return done(null);
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME);
+          }
+        };
+        req.onsuccess = () => {
+          const db = req.result;
+          db.onversionchange = () => { db.close(); dbInstancePromise = null; };
+          db.onclose = () => { dbInstancePromise = null; };
+          done(db);
+        };
+        req.onerror = () => done(null);
+        req.onblocked = () => done(null);
+      } catch (err) {
+        done(null);
+      }
+    });
+    return dbInstancePromise;
+  }
+
+  async function saveChunkIncrementalToDisk(chunkBlob, chunkIndex, mimeType, elapsedSecs) {
+    try {
+      const db = await getBackupDB();
+      if (!db) return;
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const chunkKey = `chunk_${String(chunkIndex).padStart(6, '0')}`;
+      store.put(chunkBlob, chunkKey);
+      store.put({
+        count: chunkIndex + 1,
+        mimeType: mimeType || 'audio/webm',
+        durationSecs: elapsedSecs,
+        updatedAt: Date.now()
+      }, META_KEY);
+    } catch (e) {}
+  }
+
+  async function saveFullBlobToDisk(blob, mimeType, elapsedSecs) {
+    try {
+      const db = await getBackupDB();
+      if (!db) return;
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      store.clear();
+      store.put(blob, 'chunk_000000');
+      store.put({
+        count: 1,
+        mimeType: mimeType || blob.type || 'audio/webm',
+        durationSecs: elapsedSecs,
+        updatedAt: Date.now()
+      }, META_KEY);
+    } catch (e) {}
+  }
+
+  async function loadBackupFromDisk() {
+    try {
+      const db = await getBackupDB();
+      if (!db) return null;
+      return new Promise((resolve) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const metaReq = store.get(META_KEY);
+
+        metaReq.onsuccess = () => {
+          const meta = metaReq.result;
+          if (!meta || !meta.count || meta.count <= 0) return resolve(null);
+
+          const chunks = new Array(meta.count);
+          let loaded = 0;
+          let failed = false;
+
+          for (let i = 0; i < meta.count; i++) {
+            const key = `chunk_${String(i).padStart(6, '0')}`;
+            const cReq = store.get(key);
+            cReq.onsuccess = () => {
+              if (cReq.result) chunks[i] = cReq.result;
+              loaded++;
+              if (loaded === meta.count && !failed) {
+                const validChunks = chunks.filter(Boolean);
+                resolve({
+                  chunks: validChunks,
+                  mimeType: meta.mimeType || 'audio/webm',
+                  durationSecs: meta.durationSecs || null
+                });
+              }
+            };
+            cReq.onerror = () => {
+              if (!failed) { failed = true; resolve(null); }
+            };
+          }
+        };
+        metaReq.onerror = () => resolve(null);
+      });
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function clearBackupFromDisk() {
+    try {
+      const db = await getBackupDB();
+      if (!db) return;
+      return new Promise((resolve) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).clear();
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      });
+    } catch (e) {}
+  }
+
+  // ============================================================================
+  // 3. ESTADO GLOBAL Y ELEMENTOS DOM
+  // ============================================================================
+  let geminiKey = safeStorage.getItem(STORAGE_KEYS.API_KEY) || '';
+  let availableModelsMap = new Map();
+
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let displayStream = null;
+  let micStream = null;
+  let combinedStream = null;
+  let audioContext = null;
+  let analyserNode = null;
+  let analyserBuffer = null;
+
+  let currentLoadedItem = null;
+  let markdownResult = '';
+
+  let accumulatedRecordingMs = 0;
+  let lastResumeTimestamp = 0;
+  let recordingElapsedSecs = 0;
+  let timerInterval = null;
+
+  const authCard = document.getElementById('auth-card');
+  const appCard = document.getElementById('app-card');
+  const apiKeyGeminiInput = document.getElementById('api-key-gemini');
+  const authError = document.getElementById('auth-error');
+  const btnLogin = document.getElementById('btn-login');
+
+  const modelSelector = document.getElementById('model-selector');
+  const btnRefreshModels = document.getElementById('btn-refresh-models');
+  const captureModeSelector = document.getElementById('capture-mode');
+
+  const meetingAttendeesInput = document.getElementById('meeting-attendees');
+  const liveNotesTextarea = document.getElementById('live-notes');
+  const btnClearNotes = document.getElementById('btn-clear-notes');
+
+  const btnStart = document.getElementById('btn-start');
+  const btnPause = document.getElementById('btn-pause');
+  const btnStop = document.getElementById('btn-stop');
+  const btnToggleUpload = document.getElementById('btn-toggle-upload');
+  const btnTogglePrompt = document.getElementById('btn-toggle-prompt');
+
+  const uploadSection = document.getElementById('upload-section');
+  const fileInput = document.getElementById('file-input');
+  const btnProcessFile = document.getElementById('btn-process-file');
+
+  const promptSection = document.getElementById('prompt-section');
+  const promptTextarea = document.getElementById('prompt-textarea');
+  const btnSavePrompt = document.getElementById('btn-save-prompt');
+  const btnPresetScs = document.getElementById('btn-preset-scs');
+  const btnPresetYaml = document.getElementById('btn-preset-yaml');
+  
+  const rescueBox = document.getElementById('rescue-box');
+  const rescueTitle = document.getElementById('rescue-title');
+  const rescueInfo = document.getElementById('rescue-info');
+  const btnDownloadMp3 = document.getElementById('btn-download-mp3');
+  const btnDownloadAudio = document.getElementById('btn-download-audio');
+  const btnRetryAi = document.getElementById('btn-retry-ai');
+  const btnClearRescue = document.getElementById('btn-clear-rescue');
+
+  const statusContainer = document.getElementById('status-container');
+  const statusText = document.getElementById('status-text');
+  const signalBadge = document.getElementById('signal-badge');
+  const signalText = document.getElementById('signal-text');
+  const warnBanner = document.getElementById('warn-banner');
+  const errorBanner = document.getElementById('error-banner');
+  const okBanner = document.getElementById('ok-banner');
+
+  const metricsPanel = document.getElementById('metrics-panel');
+  const metricModel = document.getElementById('metric-model');
+  const metricSize = document.getElementById('metric-size');
+  const metricDuration = document.getElementById('metric-duration');
+  const metricLatency = document.getElementById('metric-latency');
+
+  const outputArea = document.getElementById('output-area');
+  const markdownRender = document.getElementById('markdown-render');
+  const btnCopy = document.getElementById('btn-copy');
+  const btnDownload = document.getElementById('btn-download');
+
+  window.addEventListener('beforeunload', (e) => {
+    if (mediaRecorder && (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused')) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+
+  liveNotesTextarea.addEventListener('input', () => {
+    safeStorage.setItem(STORAGE_KEYS.LIVE_NOTES, liveNotesTextarea.value);
+  });
+  meetingAttendeesInput.addEventListener('input', () => {
+    safeStorage.setItem(STORAGE_KEYS.ATTENDEES, meetingAttendeesInput.value);
+  });
+  btnClearNotes.addEventListener('click', () => {
+    liveNotesTextarea.value = '';
+    safeStorage.removeItem(STORAGE_KEYS.LIVE_NOTES);
+  });
+
+  function showError(msg) {
+    if (!msg) {
+      errorBanner.classList.add('hidden');
+      errorBanner.innerText = '';
+      return;
+    }
+    errorBanner.innerText = msg;
+    errorBanner.classList.remove('hidden');
+  }
+
+  function showWarning(msg) {
+    if (!msg) {
+      warnBanner.classList.add('hidden');
+      warnBanner.innerText = '';
+      return;
+    }
+    warnBanner.innerText = msg;
+    warnBanner.classList.remove('hidden');
+  }
+
+  function showOkMessage(msg) {
+    if (!msg) {
+      okBanner.classList.add('hidden');
+      return;
+    }
+    okBanner.innerText = msg;
+    okBanner.classList.remove('hidden');
+    setTimeout(() => okBanner.classList.add('hidden'), 3500);
+  }
+
+  // ============================================================================
+  // 4. SINCRONIZACIÓN DE MODELOS REALES DE GEMINI API
+  // ============================================================================
+  async function fetchGeminiModelsFromApi(apiKey) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=100&key=${encodeURIComponent(apiKey)}`, {
+        signal: controller.signal
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error?.message || `HTTP ${res.status}`);
+      }
+
+      const rawModels = data.models || [];
+      const validModels = rawModels
+        .filter(m => {
+          if (!m.name || !m.name.startsWith('models/gemini-')) return false;
+          const methods = m.supportedGenerationMethods || [];
+          if (!methods.includes('generateContent')) return false;
+          const id = m.name.replace('models/', '').toLowerCase();
+          const excludedKeywords = ['tts', 'image', 'vision', 'embedding', 'aqa', 'robotics', 'computer-use', 'thinking-exp'];
+          return !excludedKeywords.some(kw => id.includes(kw));
+        })
+        .map(m => {
+          const id = m.name.replace('models/', '');
+          return {
+            id,
+            displayName: m.displayName ? `${m.displayName} (${id})` : id,
+            outputTokenLimit: m.outputTokenLimit || 8192
+          };
+        });
+
+      validModels.sort((a, b) => b.id.localeCompare(a.id));
+
+      if (validModels.length === 0) {
+        return FALLBACK_MODELS;
+      }
+
+      safeStorage.setItem(STORAGE_KEYS.CACHED_MODELS, JSON.stringify(validModels));
+      return validModels;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  function renderModelSelector(modelsList) {
+    const cleanList = (Array.isArray(modelsList) ? modelsList : []).filter(m => m && m.id && !m.id.includes('3.8'));
+    const listToUse = cleanList.length > 0 ? cleanList : FALLBACK_MODELS;
+
+    availableModelsMap.clear();
+    modelSelector.innerHTML = '';
+
+    listToUse.forEach(m => {
+      availableModelsMap.set(m.id, m);
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.innerText = m.displayName;
+      modelSelector.appendChild(opt);
+    });
+
+    const savedModel = safeStorage.getItem(STORAGE_KEYS.SELECTED_MODEL);
+    if (savedModel && availableModelsMap.has(savedModel) && !savedModel.includes('3.8')) {
+      modelSelector.value = savedModel;
+    } else {
+      const preferred = listToUse.find(m => m.id === 'gemini-2.5-flash')
+                     || listToUse.find(m => m.id.includes('flash') && !m.id.includes('lite'))
+                     || listToUse[0];
+      if (preferred) {
+        modelSelector.value = preferred.id;
+        safeStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, preferred.id);
+      }
+    }
+  }
+
+  modelSelector.addEventListener('change', () => {
+    safeStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, modelSelector.value);
+  });
+
+  captureModeSelector.addEventListener('change', () => {
+    safeStorage.setItem(STORAGE_KEYS.CAPTURE_MODE, captureModeSelector.value);
+  });
+
+  btnRefreshModels.addEventListener('click', async () => {
+    showError(null);
+    btnRefreshModels.disabled = true;
+    btnRefreshModels.innerText = "Cargando...";
+    try {
+      const models = await fetchGeminiModelsFromApi(geminiKey);
+      renderModelSelector(models);
+      showOkMessage(`Lista sincronizada: ${models.length} modelos oficiales disponibles.`);
+    } catch (err) {
+      renderModelSelector(FALLBACK_MODELS);
+      showWarning("No se pudo conectar con Google AI (" + err.message + "). Se cargó la lista segura por defecto.");
+    } finally {
+      btnRefreshModels.disabled = false;
+      btnRefreshModels.innerText = "↻ Sincronizar lista";
+    }
+  });
+
+  // ============================================================================
+  // 5. GESTIÓN DEL PROMPT Y COMPATIBILIDAD CON CALLOUT DE OBSIDIAN
+  // ============================================================================
+  function loadPromptIntoEditor() {
+    const savedPrompt = safeStorage.getItem(STORAGE_KEYS.CUSTOM_PROMPT);
+    promptTextarea.value = savedPrompt !== null ? savedPrompt : DEFAULT_PROMPT_TEMPLATE;
+  }
+
+  function isObsidianCalloutMode(text) {
+    return text.includes('> [!NOTE]') || text.includes('OBSIDIAN CALLOUT');
+  }
+
+  function getActiveSystemPrompt() {
+    const currentText = promptTextarea.value.trim() || safeStorage.getItem(STORAGE_KEYS.CUSTOM_PROMPT) || DEFAULT_PROMPT_TEMPLATE;
+    const todayStr = new Date().toISOString().split('T')[0];
+    let finalPrompt = currentText.replace(/\{\{FECHA\}\}/g, todayStr);
+
+    const attendees = meetingAttendeesInput.value.trim();
+    const liveNotes = liveNotesTextarea.value.trim();
+    const calloutMode = isObsidianCalloutMode(finalPrompt);
+
+    if (attendees) {
+      if (calloutMode) {
+        finalPrompt += `\n\n[CONTEXTO ADICIONAL / UNIDADES O ASISTENTES]:\nTen en cuenta la siguiente referencia contextual o de participantes para identificar siglas, centros o responsables de tareas (Action Items), manteniendo siempre la redacción impersonal en el resto del acta: ${attendees}.`;
+      } else {
+        finalPrompt += `\n\n[CONTEXTO DE ASISTENTES PROPORCIONADO POR EL USUARIO]:\nLos participantes o unidades en esta reunión son: ${attendees}.`;
+      }
+    }
+
+    if (liveNotes) {
+      finalPrompt += `\n\n[NOTAS DEL USUARIO TOMADAS EN TIEMPO REAL]:\nEl usuario registró los siguientes apuntes durante la llamada. Úsalos como referencia de ALTA PRIORIDAD para verificar acuerdos clave, siglas y tareas, e intégralos en la sección de notas del documento respetando estrictamente el formato de salida:\n${liveNotes}`;
+    }
+
+    return finalPrompt;
+  }
+
+  function ensureUserNotesInMarkdown(generatedMd) {
+    const liveNotes = liveNotesTextarea.value.trim();
+    if (!liveNotes) return generatedMd;
+
+    const lower = generatedMd.toLowerCase();
+    if (lower.includes('notas rápidas') || lower.includes('apuntes de sesión') || lower.includes('notas manuales')) {
+      return generatedMd;
+    }
+
+    const trimmedMd = generatedMd.trimStart();
+    if (trimmedMd.startsWith('>')) {
+      const formattedNotes = liveNotes
+        .split('\n')
+        .map(line => `> ${line}`)
+        .join('\n');
+      return `${generatedMd.trimEnd()}\n> \n> ---\n> \n> ### Notas rápidas de sesión (Apuntes Originales)\n${formattedNotes}\n`;
+    }
+
+    const notesSection = `\n\n## Notas Rápidas del Usuario (Apuntes Originales)\n${liveNotes}\n`;
+    const dividerIndex = generatedMd.indexOf('# Crónica Cronológica');
+    if (dividerIndex !== -1) {
+      return generatedMd.slice(0, dividerIndex) + notesSection + '\n---\n\n' + generatedMd.slice(dividerIndex);
+    }
+    return generatedMd + notesSection;
+  }
+
+  btnTogglePrompt.addEventListener('click', () => {
+    promptSection.classList.toggle('hidden');
+  });
+
+  btnSavePrompt.addEventListener('click', () => {
+    const val = promptTextarea.value.trim();
+    if (!val) {
+      showError("El prompt no puede estar vacío.");
+      return;
+    }
+    safeStorage.setItem(STORAGE_KEYS.CUSTOM_PROMPT, val);
+    showOkMessage("Prompt guardado localmente como predeterminado.");
+  });
+
+  btnPresetScs.addEventListener('click', () => {
+    promptTextarea.value = PROMPT_SCS_OBSIDIAN;
+    safeStorage.setItem(STORAGE_KEYS.CUSTOM_PROMPT, PROMPT_SCS_OBSIDIAN);
+    showOkMessage("Cargada y guardada la Plantilla SCS (Obsidian Callout).");
+  });
+
+  btnPresetYaml.addEventListener('click', () => {
+    promptTextarea.value = PROMPT_STANDARD_YAML;
+    safeStorage.setItem(STORAGE_KEYS.CUSTOM_PROMPT, PROMPT_STANDARD_YAML);
+    showOkMessage("Cargada y guardada la Plantilla Estándar (YAML).");
+  });
+
+  // ============================================================================
+  // 6. AUTENTICACIÓN Y PANTALLA PRINCIPAL
+  // ============================================================================
+  window.handleLoginClick = async function() {
+    authError.classList.add('hidden');
+    const val = apiKeyGeminiInput.value.trim();
+    if (val.length < 15) {
+      authError.innerText = "Por favor, introduce una clave API de Google Gemini válida.";
+      authError.classList.remove('hidden');
+      return;
+    }
+
+    btnLogin.disabled = true;
+    btnLogin.innerText = "Validando clave con Google AI...";
+
+    try {
+      const models = await fetchGeminiModelsFromApi(val);
+      geminiKey = val;
+      safeStorage.setItem(STORAGE_KEYS.API_KEY, geminiKey);
+      renderModelSelector(models);
+      enterMainScreen(true);
+    } catch (err) {
+      const msg = err.message || '';
+      if (msg.includes('400') || msg.includes('403') || msg.toLowerCase().includes('key not valid')) {
+        authError.innerText = "La API Key introducida no es válida: " + msg;
+        authError.classList.remove('hidden');
+      } else {
+        geminiKey = val;
+        safeStorage.setItem(STORAGE_KEYS.API_KEY, geminiKey);
+        renderModelSelector(FALLBACK_MODELS);
+        enterMainScreen(true);
+        showWarning("No se pudo sincronizar la lista de modelos en este instante (" + msg + "). Se activó Gemini 2.5 Flash por defecto.");
+      }
+    } finally {
+      btnLogin.disabled = false;
+      btnLogin.innerText = "Validar y Entrar";
+    }
+  };
+
+  window.handleLogoutClick = async function() {
+    await cleanupMediaResources();
+    safeStorage.removeItem(STORAGE_KEYS.API_KEY);
+    geminiKey = '';
+    appCard.classList.add('hidden');
+    authCard.classList.remove('hidden');
+    apiKeyGeminiInput.value = '';
+  };
+
+  function enterMainScreen(modelsAlreadyRendered = false) {
+    authCard.classList.add('hidden');
+    appCard.classList.remove('hidden');
+
+    loadPromptIntoEditor();
+
+    const savedCaptureMode = safeStorage.getItem(STORAGE_KEYS.CAPTURE_MODE);
+    if (savedCaptureMode) captureModeSelector.value = savedCaptureMode;
+
+    const savedNotes = safeStorage.getItem(STORAGE_KEYS.LIVE_NOTES);
+    if (savedNotes) liveNotesTextarea.value = savedNotes;
+
+    const savedAttendees = safeStorage.getItem(STORAGE_KEYS.ATTENDEES);
+    if (savedAttendees) meetingAttendeesInput.value = savedAttendees;
+
+    if (!modelsAlreadyRendered) {
+      const cached = safeStorage.getItem(STORAGE_KEYS.CACHED_MODELS);
+      if (cached) {
+        try { renderModelSelector(JSON.parse(cached)); } catch (e) { renderModelSelector(FALLBACK_MODELS); }
+      } else {
+        renderModelSelector(FALLBACK_MODELS);
+      }
+
+      fetchGeminiModelsFromApi(geminiKey)
+        .then(freshModels => renderModelSelector(freshModels))
+        .catch(() => {});
+    }
+
+    loadBackupFromDisk().then(recovered => {
+      if (recovered && Array.isArray(recovered.chunks) && recovered.chunks.length > 0) {
+        const blob = new Blob(recovered.chunks, { type: recovered.mimeType || 'audio/webm' });
+        if (blob.size > 0) {
+          currentLoadedItem = {
+            type: 'audio',
+            data: blob,
+            durationSecs: recovered.durationSecs || null
+          };
+          showRescueBox(blob, "Grabación recuperada automáticamente del disco local:");
+        }
+      }
+    }).catch(() => {});
+  }
+
+  if (geminiKey && geminiKey.length >= 15) {
+    enterMainScreen(false);
+  }
+
+  btnToggleUpload.addEventListener('click', () => {
+    uploadSection.classList.toggle('hidden');
+  });
+
+  // ============================================================================
+  // 7. CAPTURA DE AUDIO Y LIBERACIÓN ESTRICTA DE HARDWARE
+  // ============================================================================
+  async function cleanupMediaResources() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    signalBadge.classList.add('hidden');
+    analyserNode = null;
+    analyserBuffer = null;
+
+    if (combinedStream) {
+      combinedStream.getTracks().forEach(t => t.stop());
+      combinedStream = null;
+    }
+    if (displayStream) {
+      displayStream.getTracks().forEach(t => t.stop());
+      displayStream = null;
+    }
+    if (micStream) {
+      micStream.getTracks().forEach(t => t.stop());
+      micStream = null;
+    }
+    if (audioContext && audioContext.state !== 'closed') {
+      try { await audioContext.close(); } catch (e) {}
+      audioContext = null;
+    }
+  }
+
+  function getSupportedMimeType() {
+    const types = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/ogg;codecs=opus',
+      'audio/mp4'
+    ];
+    for (const t of types) {
+      if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(t)) return t;
+    }
+    return '';
+  }
+
+  function formatDuration(totalSeconds) {
+    const hrs = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    return hrs > 0 ? `${hrs}h ${mins}m ${secs}s` : `${mins}m ${secs}s`;
+  }
+
+  btnStart.addEventListener('click', async () => {
+    showError(null);
+    showWarning(null);
+    const mode = captureModeSelector.value;
+
+    try {
+      updateStatus("Solicitando permisos de captura...", 'idle');
+
+      if (mode === 'dual' || mode === 'system') {
+        displayStream = await navigator.mediaDevices.getDisplayMedia({
+          video: {
+            frameRate: { ideal: 1, max: 1 },
+            width: { ideal: 320, max: 320 },
+            height: { ideal: 240, max: 240 }
+          },
+          audio: {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false
+          }
+        });
+
+        if (displayStream.getAudioTracks().length === 0) {
+          await cleanupMediaResources();
+          showError("Atención: No marcaste la casilla 'Compartir audio del sistema / pestaña' en la ventana emergente.");
+          updateStatus("Listo", 'idle');
+          return;
+        }
+      }
+
+      if (mode === 'dual' || mode === 'mic') {
+        try {
+          micStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+              channelCount: 1
+            }
+          });
+        } catch (micErr) {
+          if (mode === 'mic') {
+            throw new Error("No se pudo acceder al micrófono: " + micErr.message);
+          } else {
+            showWarning("Aviso: El micrófono está ocupado o no disponible. Grabando únicamente el audio de la videollamada.");
+            micStream = null;
+          }
+        }
+      }
+
+      audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+
+      const compressor = audioContext.createDynamicsCompressor();
+      analyserNode = audioContext.createAnalyser();
+      analyserNode.fftSize = 256;
+      analyserBuffer = new Uint8Array(analyserNode.frequencyBinCount);
+
+      const dest = audioContext.createMediaStreamDestination();
+      dest.channelCount = 1;
+
+      if (displayStream && displayStream.getAudioTracks().length > 0) {
+        audioContext.createMediaStreamSource(displayStream).connect(compressor);
+      }
+      if (micStream && micStream.getAudioTracks().length > 0) {
+        audioContext.createMediaStreamSource(micStream).connect(compressor);
+      }
+
+      compressor.connect(analyserNode);
+      analyserNode.connect(dest);
+
+      combinedStream = dest.stream;
+      audioChunks = [];
+      await clearBackupFromDisk();
+
+      const mimeType = getSupportedMimeType();
+      const recorderOptions = { audioBitsPerSecond: 16000 };
+      if (mimeType) recorderOptions.mimeType = mimeType;
+
+      mediaRecorder = new MediaRecorder(combinedStream, recorderOptions);
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) {
+          const chunkIdx = audioChunks.length;
+          audioChunks.push(e.data);
+          saveChunkIncrementalToDisk(e.data, chunkIdx, mediaRecorder.mimeType, recordingElapsedSecs);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const finalMime = mediaRecorder.mimeType || 'audio/webm';
+        const audioBlob = new Blob(audioChunks, { type: finalMime });
+        await saveFullBlobToDisk(audioBlob, finalMime, recordingElapsedSecs);
+        audioChunks = [];
+        await cleanupMediaResources();
+
+        currentLoadedItem = { type: 'audio', data: audioBlob, durationSecs: recordingElapsedSecs };
+        showRescueBox(audioBlob, "Grabación protegida en disco local:");
+        processPipeline(currentLoadedItem);
+      };
+
+      mediaRecorder.start(5000);
+      accumulatedRecordingMs = 0;
+      lastResumeTimestamp = Date.now();
+      recordingElapsedSecs = 0;
+
+      signalBadge.classList.remove('hidden');
+
+      timerInterval = setInterval(async () => {
+        if (!mediaRecorder) return;
+
+        if (audioContext && audioContext.state === 'suspended' && mediaRecorder.state === 'recording') {
+          try { await audioContext.resume(); } catch (e) {}
+        }
+
+        if (mediaRecorder.state === 'recording') {
+          const totalMs = accumulatedRecordingMs + (Date.now() - lastResumeTimestamp);
+          recordingElapsedSecs = Math.floor(totalMs / 1000);
+          updateStatus(`Grabando [${formatDuration(recordingElapsedSecs)}] (16 kbps)...`, 'recording');
+
+          if (analyserNode && analyserBuffer) {
+            analyserNode.getByteTimeDomainData(analyserBuffer);
+            let maxDeviation = 0;
+            for (let i = 0; i < analyserBuffer.length; i++) {
+              const dev = Math.abs(analyserBuffer[i] - 128);
+              if (dev > maxDeviation) maxDeviation = dev;
+            }
+            signalText.innerText = maxDeviation > 2 ? "Señal: Activa" : "Señal: Silencio";
+            signalText.style.color = maxDeviation > 2 ? "#86efac" : "#94a3b8";
+          }
+        }
+      }, 1000);
+
+      btnStart.classList.add('hidden');
+      btnPause.classList.remove('hidden');
+      btnPause.innerText = "Pausar";
+      btnStop.classList.remove('hidden');
+      captureModeSelector.disabled = true;
+      outputArea.classList.add('hidden');
+      metricsPanel.classList.add('hidden');
+
+      if (displayStream && displayStream.getVideoTracks().length > 0) {
+        displayStream.getVideoTracks()[0].onended = () => {
+          if (mediaRecorder && mediaRecorder.state !== 'inactive') btnStop.click();
+        };
+      }
+
+    } catch (err) {
+      console.error(err);
+      await cleanupMediaResources();
+      captureModeSelector.disabled = false;
+      showError("No se pudo iniciar la grabación: " + err.message);
+      updateStatus("Listo", 'idle');
+    }
+  });
+
+  btnPause.addEventListener('click', async () => {
+    if (!mediaRecorder) return;
+    if (mediaRecorder.state === 'recording') {
+      mediaRecorder.pause();
+      accumulatedRecordingMs += (Date.now() - lastResumeTimestamp);
+      btnPause.innerText = "Reanudar";
+      updateStatus(`En pausa [${formatDuration(recordingElapsedSecs)}]`, 'paused');
+      signalText.innerText = "Señal: Pausada";
+    } else if (mediaRecorder.state === 'paused') {
+      if (audioContext && audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+      mediaRecorder.resume();
+      lastResumeTimestamp = Date.now();
+      btnPause.innerText = "Pausar";
+      updateStatus(`Grabando [${formatDuration(recordingElapsedSecs)}] (16 kbps)...`, 'recording');
+    }
+  });
+
+  btnStop.addEventListener('click', () => {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      if (mediaRecorder.state === 'recording') {
+        accumulatedRecordingMs += (Date.now() - lastResumeTimestamp);
+        recordingElapsedSecs = Math.floor(accumulatedRecordingMs / 1000);
+      }
+      btnStop.classList.add('hidden');
+      btnPause.classList.add('hidden');
+      btnStart.classList.remove('hidden');
+      captureModeSelector.disabled = false;
+      updateStatus("Finalizando y consolidando audio...", 'idle');
+      mediaRecorder.stop();
+    }
+  });
+
+  // ============================================================================
+  // 8. CONVERSIÓN LIGERA A MP3 (16 kHz / 32 kbps) CON CONTROL DE MEMORIA
+  // ============================================================================
+  async function convertBlobToMp3(audioBlob, onProgress) {
+    if (typeof window.lamejs === 'undefined') {
+      throw new Error("La librería MP3 (lamejs) no está cargada. Comprueba tu conexión o descarga el original en .webm.");
+    }
+
+    const sizeMb = audioBlob.size / (1024 * 1024);
+    if (sizeMb > 20) {
+      const ok = confirm(`El archivo de audio pesa ${sizeMb.toFixed(1)} MB (reunión muy larga). La conversión a MP3 en el navegador puede consumir bastante memoria RAM. ¿Deseas continuar o prefieres cancelar y descargar el archivo .webm original directamente?`);
+      if (!ok) throw new Error("Conversión cancelada por el usuario.");
+    }
+
+    let arrayBuffer = await audioBlob.arrayBuffer();
+    const tempCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+    let audioBuffer;
+    try {
+      audioBuffer = await tempCtx.decodeAudioData(arrayBuffer);
+    } finally {
+      arrayBuffer = null;
+      if (tempCtx.state !== 'closed') {
+        try { await tempCtx.close(); } catch (e) {}
+      }
+    }
+
+    const sampleRate = audioBuffer.sampleRate;
+    const samplesFloat = audioBuffer.getChannelData(0);
+    const totalSamples = samplesFloat.length;
+    const samplesInt16 = new Int16Array(totalSamples);
+
+    for (let i = 0; i < totalSamples; i++) {
+      const s = Math.max(-1, Math.min(1, samplesFloat[i]));
+      samplesInt16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+    }
+    audioBuffer = null;
+
+    const mp3encoder = new window.lamejs.Mp3Encoder(1, sampleRate, 32);
+    const mp3Data = [];
+    const sampleBlockSize = 1152;
+    const yieldEveryBlocks = 400;
+
+    for (let i = 0; i < totalSamples; i += sampleBlockSize) {
+      const sampleChunk = samplesInt16.subarray(i, i + sampleBlockSize);
+      const mp3buf = mp3encoder.encodeBuffer(sampleChunk);
+      if (mp3buf.length > 0) mp3Data.push(mp3buf);
+
+      if ((i / sampleBlockSize) % yieldEveryBlocks === 0) {
+        if (onProgress) onProgress(Math.min(99, Math.round((i / totalSamples) * 100)));
+        await new Promise(r => setTimeout(r, 0));
+      }
+    }
+
+    const mp3buf = mp3encoder.flush();
+    if (mp3buf.length > 0) mp3Data.push(mp3buf);
+
+    return new Blob(mp3Data, { type: 'audio/mp3' });
+  }
+
+  btnDownloadMp3.addEventListener('click', async () => {
+    if (!currentLoadedItem || currentLoadedItem.type !== 'audio') return;
+    showError(null);
+    const originalText = btnDownloadMp3.innerText;
+    btnDownloadMp3.disabled = true;
+    btnDownloadMp3.innerText = "Decodificando...";
+
+    try {
+      const mp3Blob = await convertBlobToMp3(currentLoadedItem.data, (pct) => {
+        btnDownloadMp3.innerText = `Convirtiendo (${pct}%)...`;
+      });
+      const url = URL.createObjectURL(mp3Blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `reunion-${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.mp3`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      showOkMessage(`Audio convertido a MP3 correctamente (${(mp3Blob.size / (1024 * 1024)).toFixed(2)} MB).`);
+    } catch (err) {
+      console.error(err);
+      if (!err.message.includes('cancelada')) {
+        showError("No se pudo convertir a MP3: " + err.message + " Descarga el archivo original (.webm).");
+      }
+    } finally {
+      btnDownloadMp3.disabled = false;
+      btnDownloadMp3.innerText = originalText;
+    }
+  });
+
+  btnDownloadAudio.addEventListener('click', () => {
+    if (!currentLoadedItem || currentLoadedItem.type !== 'audio') return;
+    const url = URL.createObjectURL(currentLoadedItem.data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reunion-${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.webm`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  });
+
+  // ============================================================================
+  // 9. SUBIDA DE ARCHIVOS EXTERNOS Y PROCESAMIENTO CON GEMINI API
+  // ============================================================================
+  function cleanTranscriptText(rawText, isCsv) {
+    let cleaned = rawText.replace(/\r\n/g, '\n');
+    if (isCsv) {
+      cleaned = cleaned
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0 && !/^[,;""\s]+$/.test(line))
+        .join('\n');
+    }
+    return cleaned;
+  }
+
+  btnProcessFile.addEventListener('click', async () => {
+    showError(null);
+    showWarning(null);
+    const file = fileInput.files[0];
+    if (!file) return showError("Selecciona primero un archivo.");
+
+    const ext = file.name.split('.').pop().toLowerCase();
+    const isTextFile = ['txt', 'md', 'csv'].includes(ext) || file.type.startsWith('text/');
+
+    if (isTextFile) {
+      updateStatus("Leyendo y optimizando archivo de transcripción...", 'idle');
+      const rawContent = await file.text();
+      const textContent = cleanTranscriptText(rawContent, ext === 'csv');
+      if (!textContent.trim()) {
+        updateStatus("Listo", 'idle');
+        return showError("El archivo de texto o CSV seleccionado está vacío.");
+      }
+      currentLoadedItem = { type: 'text', data: textContent, filename: file.name, size: file.size };
+      processPipeline(currentLoadedItem);
+    } else {
+      currentLoadedItem = { type: 'audio', data: file, durationSecs: null };
+      showRescueBox(file, "Archivo de audio externo cargado:");
+      processPipeline(currentLoadedItem);
+    }
+  });
+
+  btnRetryAi.addEventListener('click', () => {
+    if (currentLoadedItem) processPipeline(currentLoadedItem);
+  });
+
+  btnClearRescue.addEventListener('click', async () => {
+    await clearBackupFromDisk();
+    currentLoadedItem = null;
+    rescueBox.classList.add('hidden');
+  });
+
+  function showRescueBox(blob, titleText) {
+    const sizeMb = (blob.size / (1024 * 1024)).toFixed(2);
+    rescueTitle.innerText = titleText || "Grabación protegida en disco local:";
+    rescueInfo.innerText = `Tamaño: ${sizeMb} MB | Formato original: ${blob.type || 'audio/webm'}`;
+    rescueBox.classList.remove('hidden');
+  }
+
+  function renderMarkdownSafe(md) {
+    if (typeof window.marked !== 'undefined' && typeof window.marked.parse === 'function') {
+      markdownRender.innerHTML = window.marked.parse(md);
+    } else {
+      const pre = document.createElement('pre');
+      pre.style.whiteSpace = 'pre-wrap';
+      pre.style.fontFamily = 'inherit';
+      pre.textContent = md;
+      markdownRender.innerHTML = '';
+      markdownRender.appendChild(pre);
+    }
+  }
+
+  function getMaxTokensForModel(modelId) {
+    const meta = availableModelsMap.get(modelId);
+    if (meta && meta.outputTokenLimit) {
+      return Math.min(meta.outputTokenLimit, 65536);
+    }
+    return 65536;
+  }
+
+  async function processPipeline(item) {
+    showError(null);
+    let model = modelSelector.value || 'gemini-2.5-flash';
+    if (model.includes('3.8')) model = 'gemini-2.5-flash';
+
+    safeStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, model);
+    if (promptTextarea.value.trim()) {
+      safeStorage.setItem(STORAGE_KEYS.CUSTOM_PROMPT, promptTextarea.value.trim());
+    }
+
+    const startTime = performance.now();
+    btnStart.disabled = true;
+    btnRetryAi.disabled = true;
+    btnProcessFile.disabled = true;
+
+    try {
+      if (item.type === 'text') {
+        updateStatus(`Analizando transcripción con ${model}...`, 'idle');
+        await analyzeTextWithGemini(item.data, model);
+
+        metricModel.innerText = model;
+        metricSize.innerText = `${(item.size / 1024).toFixed(1)} KB (Texto/CSV)`;
+        metricDuration.innerText = `${item.data.length.toLocaleString()} caracteres`;
+      } else {
+        await processAudioWithGemini(item.data, model);
+
+        const sizeMb = (item.data.size / (1024 * 1024)).toFixed(2);
+        metricModel.innerText = model;
+        metricSize.innerText = `${sizeMb} MB (Audio)`;
+        metricDuration.innerText = item.durationSecs
+          ? formatDuration(item.durationSecs)
+          : 'Archivo externo';
+      }
+
+      markdownResult = ensureUserNotesInMarkdown(markdownResult);
+
+      const totalLatency = ((performance.now() - startTime) / 1000).toFixed(1);
+      metricLatency.innerText = `${totalLatency} seg`;
+      metricsPanel.classList.remove('hidden');
+
+      renderMarkdownSafe(markdownResult);
+      outputArea.classList.remove('hidden');
+      updateStatus("Procesamiento completado con éxito", 'idle');
+
+    } catch (err) {
+      console.error(err);
+      showError("Error en el procesamiento: " + err.message + " (Tu grabación sigue protegida para descargar o reintentar).");
+      updateStatus("Fallo en el procesamiento", 'idle');
+    } finally {
+      btnStart.disabled = false;
+      btnRetryAi.disabled = false;
+      btnProcessFile.disabled = false;
+    }
+  }
+
+  async function fetchWithRetry(url, options, maxAttempts = 3) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const res = await fetch(url, options);
+      if (res.ok) return res;
+
+      let errText = '';
+      try {
+        const errJson = await res.json();
+        errText = errJson.error?.message || JSON.stringify(errJson);
+      } catch (e) {
+        errText = await res.text();
+      }
+
+      const isTransient = res.status === 429 || res.status === 503 ||
+        errText.toLowerCase().includes('overloaded') || errText.toLowerCase().includes('demand');
+
+      if (isTransient && attempt < maxAttempts) {
+        const waitSecs = attempt * 5;
+        updateStatus(`Alta demanda en Google AI. Reintentando en ${waitSecs}s (${attempt}/${maxAttempts})...`, 'idle');
+        await new Promise(r => setTimeout(r, waitSecs * 1000));
+      } else {
+        throw new Error(`HTTP ${res.status}: ${errText}`);
+      }
+    }
+  }
+
+  function extractGeminiText(json) {
+    if (!json || !Array.isArray(json.candidates) || json.candidates.length === 0) {
+      const blockReason = json?.promptFeedback?.blockReason || 'Respuesta vacía';
+      throw new Error(`Gemini no devolvió contenido (${blockReason}).`);
+    }
+    const candidate = json.candidates[0];
+    const parts = candidate?.content?.parts;
+    if (!Array.isArray(parts) || parts.length === 0) {
+      throw new Error(`Generación interrumpida (Motivo: ${candidate.finishReason || 'Desconocido'}).`);
+    }
+    let text = parts.map(p => p.text || '').join('');
+    if (candidate.finishReason === 'MAX_TOKENS') {
+      const isCallout = text.trimStart().startsWith('>');
+      text += isCallout
+        ? '\n> \n> *[Aviso: La respuesta alcanzó el límite máximo de tokens de salida]*'
+        : '\n\n> *[Aviso: La respuesta alcanzó el límite máximo de tokens de salida]*';
+    }
+    return text;
+  }
+
+  async function analyzeTextWithGemini(textContent, model) {
+    const payload = {
+      contents: [{
+        parts: [
+          { text: getActiveSystemPrompt() },
+          { text: `Aquí tienes la transcripción completa de la reunión para su análisis:\n\n${textContent}` }
+        ]
+      }],
+      generationConfig: {
+        temperature: 0.2,
+        maxOutputTokens: getMaxTokensForModel(model)
+      }
+    };
+
+    const res = await fetchWithRetry(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(geminiKey)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    const json = await res.json();
+    markdownResult = extractGeminiText(json);
+  }
+
+  async function uploadAudioToGeminiFilesApi(audioBlob, cleanMimeType) {
+    updateStatus("Subiendo archivo extenso mediante Gemini Files API...", 'idle');
+
+    const initRes = await fetch(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${encodeURIComponent(geminiKey)}`, {
+      method: 'POST',
+      headers: {
+        'X-Goog-Upload-Protocol': 'resumable',
+        'X-Goog-Upload-Command': 'start',
+        'X-Goog-Upload-Header-Content-Length': audioBlob.size.toString(),
+        'X-Goog-Upload-Header-Content-Type': cleanMimeType,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ file: { display_name: `reunion_${Date.now()}` } })
+    });
+
+    if (!initRes.ok) {
+      throw new Error(`Fallo al iniciar sesión en Files API (HTTP ${initRes.status})`);
+    }
+
+    const uploadUrl = initRes.headers.get('x-goog-upload-url');
+    if (!uploadUrl) {
+      throw new Error("El navegador bloqueó la cabecera CORS de Files API al ejecutar desde file://. Para archivos externos de más de 14.5 MB abre el HTML desde un servidor local (http://localhost).");
+    }
+
+    const uploadRes = await fetch(uploadUrl, {
+      method: 'POST',
+      headers: {
+        'X-Goog-Upload-Offset': '0',
+        'X-Goog-Upload-Command': 'upload, finalize'
+      },
+      body: audioBlob
+    });
+
+    if (!uploadRes.ok) {
+      throw new Error(`Fallo durante la subida del audio (HTTP ${uploadRes.status})`);
+    }
+
+    const fileData = await uploadRes.json();
+    const fileUri = fileData.file.uri;
+    const fileName = fileData.file.name;
+    let fileState = fileData.file.state;
+
+    let pollCount = 0;
+    while (fileState === 'PROCESSING' && pollCount < 60) {
+      pollCount++;
+      updateStatus(`Procesando audio en Google Cloud (${pollCount * 3}s)...`, 'idle');
+      await new Promise(r => setTimeout(r, 3000));
+      const checkRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/${fileName}?key=${encodeURIComponent(geminiKey)}`);
+      if (checkRes.ok) {
+        const checkJson = await checkRes.json();
+        fileState = checkJson.state;
+      }
+    }
+
+    if (fileState !== 'ACTIVE') {
+      throw new Error(`El archivo no pasó al estado ACTIVE (Estado: ${fileState})`);
+    }
+
+    return { fileUri, fileName };
+  }
+
+  async function processAudioWithGemini(audioBlob, model) {
+    const cleanMimeType = (audioBlob.type || 'audio/webm').split(';')[0];
+    const isOverInlineLimit = audioBlob.size > 14.5 * 1024 * 1024;
+
+    let audioPart = null;
+    let uploadedFileName = null;
+
+    try {
+      if (isOverInlineLimit) {
+        const uploaded = await uploadAudioToGeminiFilesApi(audioBlob, cleanMimeType);
+        uploadedFileName = uploaded.fileName;
+        audioPart = { file_data: { mime_type: cleanMimeType, file_uri: uploaded.fileUri } };
+      } else {
+        updateStatus(`Codificando audio (${(audioBlob.size / (1024 * 1024)).toFixed(1)} MB)...`, 'idle');
+        const dataUrl = await blobToBase64(audioBlob);
+        const base64Data = dataUrl.slice(dataUrl.indexOf(',') + 1);
+        audioPart = { inline_data: { mime_type: cleanMimeType, data: base64Data } };
+      }
+
+      updateStatus(`Analizando reunión y generando acta con ${model}...`, 'idle');
+      const payload = {
+        contents: [{
+          parts: [
+            { text: getActiveSystemPrompt() },
+            audioPart
+          ]
+        }],
+        generationConfig: {
+          temperature: 0.2,
+          maxOutputTokens: getMaxTokensForModel(model)
+        }
+      };
+
+      const res = await fetchWithRetry(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(geminiKey)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      const json = await res.json();
+      markdownResult = extractGeminiText(json);
+
+    } finally {
+      if (uploadedFileName) {
+        fetch(`https://generativelanguage.googleapis.com/v1beta/${uploadedFileName}?key=${encodeURIComponent(geminiKey)}`, {
+          method: 'DELETE'
+        }).catch(() => {});
+      }
+    }
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function updateStatus(text, state) {
+    statusText.innerText = text;
+    statusContainer.classList.remove('recording', 'paused');
+    if (state === 'recording') statusContainer.classList.add('recording');
+    else if (state === 'paused') statusContainer.classList.add('paused');
+  }
+
+  btnCopy.addEventListener('click', () => {
+    navigator.clipboard.writeText(markdownResult);
+    btnCopy.innerText = "¡Copiado!";
+    setTimeout(() => btnCopy.innerText = "Copiar MD", 2000);
+  });
+
+  btnDownload.addEventListener('click', () => {
+    const blob = new Blob([markdownResult], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `acta-reunion-${new Date().toISOString().slice(0,10)}.md`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  });
+</script>
+
+</body>
+</html>
