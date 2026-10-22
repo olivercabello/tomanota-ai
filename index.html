@@ -258,14 +258,14 @@
     <div class="granola-box">
       <div class="input-group" style="margin-top: 0;">
         <label for="meeting-attendees">Contexto adicional / Unidades o Asistentes previstos (opcional):</label>
-        <input type="text" id="meeting-attendees" placeholder="Ej: HUC, Gerencia AP, Proveedor HCE, nombres para Action Items...">
+        <input type="text" id="meeting-attendees" placeholder="Ej: CENTRO, Gerencia, Proveedor, nombres para Action Items...">
       </div>
       <div class="input-group" style="margin-top: 0.75rem;">
         <label for="live-notes">
           <span>Notas rápidas tomadas durante la llamada (Compatibles con formato Callout `> `):</span>
           <button type="button" class="btn-outline btn-sm" id="btn-clear-notes" style="padding: 0.1rem 0.45rem; font-size: 0.72rem;">Limpiar notas</button>
         </label>
-        <textarea id="live-notes" style="min-height: 80px;" placeholder="Apunta el tema o sistema principal (ej. RegVacu), siglas, decisiones o tareas. La IA las priorizará al redactar el acta..."></textarea>
+        <textarea id="live-notes" style="min-height: 80px;" placeholder="Apunta el tema o sistema principal (ej. Desarrollo APP), siglas, decisiones o tareas. La IA las priorizará al redactar el acta..."></textarea>
       </div>
     </div>
 
@@ -434,23 +434,23 @@
     "",
     "### 2. REGLA DE LENGUAJE Y ENTORNO SANITARIO",
     "- Adopta un perfil lingüístico basado en la norma culta del español de Canarias. Aplica estrictamente el uso exclusivo de 'ustedes' (eliminando el voseo, 'vosotros' y sus conjugaciones). Utiliza preferentemente el Pretérito Perfecto Simple ('se acordó', 'se revisó', 'se planteó') frente al compuesto, salvo inmediatez estricta.",
-    "- Todo el análisis debe estar enfocado y contextualizado en la operativa y arquitectura del sistema sanitario español, y específicamente del Servicio Canario de la Salud (SCS), sus gerencias, centros y aplicativos.",
+    "- Todo el análisis debe estar enfocado y contextualizado en la operativa y arquitectura del detectado en la reunión, y específicamente sobre sus gerencias, centros, departamentos y aplicativos.",
     "",
     "### 3. REGLA DE AUDITORÍA FONÉTICA E INCERTIDUMBRE (MODO EJECUCIÓN ÚNICA)",
-    "- Si procesas audio o texto con posibles errores de reconocimiento fonético (términos técnicos, estándares como HL7/FHIR/DICOM, nombres de módulos de HCE, hospitales o proveedores mal transcritos), corrígelos aplicando inferencia lógica basada en el contexto sanitario solo cuando la certeza sea alta (incertidumbre <= 0.1).",
+    "- Si procesas audio o texto con posibles errores de reconocimiento fonético (términos técnicos, estándares como HL7/FHIR/DICOM, nombres de módulos, departamentos, centros o proveedores mal transcritos), corrígelos aplicando inferencia lógica basada en el contexto sanitario solo cuando la certeza sea alta (incertidumbre <= 0.1).",
     "- Si detectas acrónimos no definidos, términos fonéticamente dudosos o ambigüedades críticas en acuerdos o responsabilidades cuya incertidumbre supere el 0.1, NO inventes ni asumas su significado: márcalos en el texto con `[¿término?]` y desglósalos obligatoriamente en la sección final de auditoría del acta.",
     "",
     "### 4. FORMATO DE SALIDA: OBSIDIAN CALLOUT ESTRICTO",
     "- Devuelve ÚNICAMENTE el bloque del callout de Obsidian, sin texto introductorio ni bloques de código envolventes adicionales.",
     "- REGLA DE ORO DE FORMATO: Cada línea de la respuesta (absolutamente todas, incluidas las líneas vacías de separación) DEBE comenzar con el prefijo `> ` para que Obsidian mantenga la integridad visual del bloque.",
-    "- En la primera línea (`> [!NOTE] Transcripción resumida Reunión: ...`), coloca como primera palabra tras los dos puntos el nombre o acrónimo del sistema/tema principal tratado (ej. `RegVacu`, `HCE`, `SIAP`).",
+    "- En la primera línea (`> [!NOTE] Transcripción resumida Reunión: ...`), coloca como primera palabra tras los dos puntos el nombre o acrónimo del sistema/tema principal tratado.",
     "- Usa Markdown estándar (negritas, listas). Reserva LaTeX única y exclusivamente para fórmulas matemáticas o científicas complejas; nunca lo utilices para unidades simples, porcentajes o prosa ordinaria.",
     "",
     "Sigue EXACTAMENTE esta estructura:",
     "",
     "> [!NOTE] Transcripción resumida Reunión: [Tema/Sistema principal y título conciso de la Reunión]",
     "> **Fecha de Análisis:** {{FECHA}}",
-    "> **Centros / Ámbitos implicados:** [Gerencias, hospitales, centros de salud, servicios o áreas técnicas mencionadas. Si no se especifican, indicar \"No especificados\"]",
+    "> **Centros / Ámbitos implicados:** [Gerencias, centros, servicios o áreas técnicas mencionadas. Si no se especifican, indicar \"No especificados\"]",
     "> ",
     "> ### Objetivo y Contexto Operativo (Teletipo)",
     "> [Párrafo directo de 3 a 5 líneas, estilo cable de agencia y sin preámbulos, resumiendo el propósito central de la sesión, los sistemas afectados y el resultado global].",
