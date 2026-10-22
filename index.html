@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📝 TomaNota AI v7.4 - Grabador & Analizador de Reuniones</title>
+  <title>📝 TomaNota AI v7.5 - Grabador & Analizador de Reuniones (Edición Estable)</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js" defer></script>
   <style>
@@ -43,6 +43,30 @@
       font-size: 0.85rem; line-height: 1.5; resize: vertical;
     }
     input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+
+    .checkbox-group {
+      margin-top: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      background: #0b1120;
+      border: 1px solid var(--border);
+      padding: 0.55rem 0.85rem;
+      border-radius: 8px;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+    .checkbox-group label {
+      font-size: 0.84rem;
+      color: var(--text);
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+    }
 
     .grid-config { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.85rem; margin-top: 0.5rem; }
 
@@ -161,14 +185,14 @@
       </div>
       <div>
         <h1 style="font-size: 1.5rem;">TomaNota AI</h1>
-        <p style="font-size: 0.85rem;">Configuración de Google Gemini API (Edición Estable v7.4)</p>
+        <p style="font-size: 0.85rem;">Configuración de Google Gemini API (Edición Estable v7.5)</p>
       </div>
     </div>
     <p>Introduce tu clave de Google AI Studio. Se validará y guardará localmente en tu navegador.</p>
 
     <div class="input-group" style="margin-top: 1rem;">
       <label for="api-key-gemini">Gemini API Key</label>
-      <input type="password" id="api-key-gemini" placeholder="Pega aquí tu API Key (AIzaSy... o AQ...)" onkeydown="if(event.key==='Enter') handleLoginClick()">
+      <input type="password" id="api-key-gemini" placeholder="Pega aquí tu API Key (AIzaSy...)" onkeydown="if(event.key==='Enter') handleLoginClick()">
     </div>
 
     <div id="auth-error" class="banner banner-error hidden"></div>
@@ -197,9 +221,9 @@
         </div>
         <div>
           <h1 style="display: flex; align-items: center; gap: 0.5rem;">
-            TomaNota AI <span style="font-size: 0.75rem; background: var(--success); color: white; padding: 0.1rem 0.45rem; border-radius: 6px;">v7.4 Estable</span>
+            TomaNota AI <span style="font-size: 0.75rem; background: var(--success); color: white; padding: 0.1rem 0.45rem; border-radius: 6px;">v7.5 Estable</span>
           </h1>
-          <p>Captura de bajo consumo (16 kbps), autoguardado incremental en disco, MP3 ligero y soporte Obsidian.</p>
+          <p>Captura de bajo consumo (16 kbps), autoguardado incremental en disco, autodescarga inteligente y soporte Obsidian.</p>
         </div>
       </div>
       <button type="button" class="btn-outline btn-sm" id="btn-logout" onclick="handleLogoutClick()">Cambiar API Key</button>
@@ -224,18 +248,24 @@
       </div>
     </div>
 
+    <!-- OPCIÓN PERSISTENTE DE AUTODESCARGA WEBM -->
+    <div class="checkbox-group">
+      <input type="checkbox" id="chk-auto-download-webm">
+      <label for="chk-auto-download-webm">Descargar archivo <code>.webm</code> automáticamente tras procesar la reunión (con prefijo del tema detectado)</label>
+    </div>
+
     <!-- PANEL DE CONTEXTO Y NOTAS EN DIRECTO -->
     <div class="granola-box">
       <div class="input-group" style="margin-top: 0;">
         <label for="meeting-attendees">Contexto adicional / Unidades o Asistentes previstos (opcional):</label>
-        <input type="text" id="meeting-attendees" placeholder="Ej: Centro, Gerencia, Proveedor, nombres para Action Items...">
+        <input type="text" id="meeting-attendees" placeholder="Ej: HUC, Gerencia AP, Proveedor HCE, nombres para Action Items...">
       </div>
       <div class="input-group" style="margin-top: 0.75rem;">
         <label for="live-notes">
           <span>Notas rápidas tomadas durante la llamada (Compatibles con formato Callout `> `):</span>
           <button type="button" class="btn-outline btn-sm" id="btn-clear-notes" style="padding: 0.1rem 0.45rem; font-size: 0.72rem;">Limpiar notas</button>
         </label>
-        <textarea id="live-notes" style="min-height: 80px;" placeholder="Apunta siglas, decisiones clave o tareas sobre la marcha. La IA las priorizará al redactar el acta..."></textarea>
+        <textarea id="live-notes" style="min-height: 80px;" placeholder="Apunta el tema o sistema principal (ej. RegVacu), siglas, decisiones o tareas. La IA las priorizará al redactar el acta..."></textarea>
       </div>
     </div>
 
@@ -276,7 +306,7 @@
       <label for="prompt-textarea" style="margin-bottom: 0.4rem;">
         <span>Prompt del Sistema (Usa <code>{{FECHA}}</code> para insertar la fecha actual):</span>
         <div style="display: flex; gap: 0.4rem;">
-          <button type="button" class="btn-outline btn-sm" id="btn-preset-scs">Cargar Plantilla (Obsidian Callout)</button>
+          <button type="button" class="btn-outline btn-sm" id="btn-preset-scs">Cargar Plantilla SCS (Obsidian Callout)</button>
           <button type="button" class="btn-outline btn-sm" id="btn-preset-yaml">Cargar Plantilla Estándar (YAML)</button>
         </div>
       </label>
@@ -337,7 +367,7 @@
 </div>
 
 <footer>
-  <p><strong>TomaNota AI v7.4</strong> — Desarrollado por <strong>Oliver Cabello</strong> & <strong>Alejandro Jara</strong> | <a href="https://github.com/olivercabello/tomanota-ai" target="_blank" rel="noopener noreferrer">Repositorio en GitHub</a></p>
+  <p><strong>TomaNota AI v7.5</strong> — Desarrollado por <strong>Oliver Cabello</strong> & <strong>Alejandro Jara</strong> | <a href="https://github.com/olivercabello/tomanota-ai" target="_blank">Repositorio en GitHub</a></p>
   <p style="font-size: 0.75rem; color: #64748b; max-width: 700px; margin: 0 auto;">
     <em>Disclaimer:</em> Esta herramienta procesa audio y texto localmente mediante la API de Google Gemini utilizando tu propia clave personal. Los autores no almacenan, recopilan ni tienen acceso a ninguna grabación, transcripción o clave introducida en la aplicación.
   </p>
@@ -381,18 +411,17 @@
     CACHED_MODELS: 'transcriptor_gemini_models_cache',
     CUSTOM_PROMPT: 'transcriptor_gemini_custom_prompt',
     CAPTURE_MODE: 'transcriptor_capture_mode',
+    AUTO_DOWNLOAD_WEBM: 'transcriptor_auto_download_webm',
     LIVE_NOTES: 'transcriptor_live_notes',
     ATTENDEES: 'transcriptor_attendees'
   };
 
-  // Modelos reales vigentes en la API oficial de Google AI Studio
   const FALLBACK_MODELS = [
     { id: 'gemini-2.5-flash', displayName: 'Gemini 2.5 Flash (Recomendado)', outputTokenLimit: 65536 },
     { id: 'gemini-2.5-pro', displayName: 'Gemini 2.5 Pro (Análisis profundo)', outputTokenLimit: 65536 },
     { id: 'gemini-2.0-flash', displayName: 'Gemini 2.0 Flash', outputTokenLimit: 8192 }
   ];
 
-  // Plantilla predeterminada: Especializada en Sistemas de Información Sanitaria (SCS) + Callout Obsidian
   const PROMPT_SCS_OBSIDIAN = [
     "Eres un analista técnico de primer nivel especializado en procesar grabaciones de audio y depurar transcripciones automáticas en crudo de reuniones sobre sistemas de información sanitaria e historia clínica electrónica (HCE). Tu objetivo es consolidar actas de reuniones e informes operativos en una única ejecución (one-shot) con un nivel de precisión técnica absoluto, aplicando un enfoque proactivo que anticipe problemas y evite cualquier ambigüedad en el sector salud.",
     "",
@@ -414,11 +443,12 @@
     "### 4. FORMATO DE SALIDA: OBSIDIAN CALLOUT ESTRICTO",
     "- Devuelve ÚNICAMENTE el bloque del callout de Obsidian, sin texto introductorio ni bloques de código envolventes adicionales.",
     "- REGLA DE ORO DE FORMATO: Cada línea de la respuesta (absolutamente todas, incluidas las líneas vacías de separación) DEBE comenzar con el prefijo `> ` para que Obsidian mantenga la integridad visual del bloque.",
+    "- En la primera línea (`> [!NOTE] Transcripción resumida Reunión: ...`), coloca como primera palabra tras los dos puntos el nombre o acrónimo del sistema/tema principal tratado (ej. `RegVacu`, `HCE`, `SIAP`).",
     "- Usa Markdown estándar (negritas, listas). Reserva LaTeX única y exclusivamente para fórmulas matemáticas o científicas complejas; nunca lo utilices para unidades simples, porcentajes o prosa ordinaria.",
     "",
     "Sigue EXACTAMENTE esta estructura:",
     "",
-    "> [!NOTE] Transcripción resumida Reunión: [Título conciso de la Reunión o Sistemas Evaluados]",
+    "> [!NOTE] Transcripción resumida Reunión: [Tema/Sistema principal y título conciso de la Reunión]",
     "> **Fecha de Análisis:** {{FECHA}}",
     "> **Centros / Ámbitos implicados:** [Gerencias, hospitales, centros de salud, servicios o áreas técnicas mencionadas. Si no se especifican, indicar \"No especificados\"]",
     "> ",
@@ -456,10 +486,10 @@
     "Eres un analista experto en secretaría técnica y gestión de proyectos.",
     "A partir de la transcripción, grabación y las notas suministradas, genera un reporte estructurado y riguroso.",
     "",
-    "Sigue EXACTAMENTE esta estructura en Markdown:",
+    "Sigue EXACTAMENTE esta estructura en Markdown (comenzando el campo 'titulo' con la palabra clave o acrónimo del tema principal):",
     "",
     "---",
-    "titulo: \"[Título conciso y representativo de la sesión]\"",
+    "titulo: \"[PalabraClaveTema - Título conciso y representativo de la sesión]\"",
     "fecha: {{FECHA}}",
     "duracion_estimada: \"[Duración o volumen aproximado]\"",
     "asistentes:",
@@ -544,7 +574,7 @@
     return dbInstancePromise;
   }
 
-  async function saveChunkIncrementalToDisk(chunkBlob, chunkIndex, mimeType, elapsedSecs) {
+  async function saveChunkIncrementalToDisk(chunkBlob, chunkIndex, mimeType, elapsedSecs, timestampStr) {
     try {
       const db = await getBackupDB();
       if (!db) return;
@@ -556,12 +586,13 @@
         count: chunkIndex + 1,
         mimeType: mimeType || 'audio/webm',
         durationSecs: elapsedSecs,
+        timestampStr: timestampStr,
         updatedAt: Date.now()
       }, META_KEY);
     } catch (e) {}
   }
 
-  async function saveFullBlobToDisk(blob, mimeType, elapsedSecs) {
+  async function saveFullBlobToDisk(blob, mimeType, elapsedSecs, timestampStr) {
     try {
       const db = await getBackupDB();
       if (!db) return;
@@ -573,6 +604,7 @@
         count: 1,
         mimeType: mimeType || blob.type || 'audio/webm',
         durationSecs: elapsedSecs,
+        timestampStr: timestampStr,
         updatedAt: Date.now()
       }, META_KEY);
     } catch (e) {}
@@ -606,7 +638,8 @@
                 resolve({
                   chunks: validChunks,
                   mimeType: meta.mimeType || 'audio/webm',
-                  durationSecs: meta.durationSecs || null
+                  durationSecs: meta.durationSecs || null,
+                  timestampStr: meta.timestampStr || null
                 });
               }
             };
@@ -636,7 +669,7 @@
   }
 
   // ============================================================================
-  // 3. ESTADO GLOBAL Y ELEMENTOS DOM
+  // 3. ESTADO GLOBAL, NOMBRADO INTELIGENTE DE ARCHIVOS Y ELEMENTOS DOM
   // ============================================================================
   let geminiKey = safeStorage.getItem(STORAGE_KEYS.API_KEY) || '';
   let availableModelsMap = new Map();
@@ -652,6 +685,8 @@
 
   let currentLoadedItem = null;
   let markdownResult = '';
+  let currentMeetingTopicSlug = '';
+  let activeRecordingTimestampStr = '';
 
   let accumulatedRecordingMs = 0;
   let lastResumeTimestamp = 0;
@@ -667,6 +702,7 @@
   const modelSelector = document.getElementById('model-selector');
   const btnRefreshModels = document.getElementById('btn-refresh-models');
   const captureModeSelector = document.getElementById('capture-mode');
+  const chkAutoDownloadWebm = document.getElementById('chk-auto-download-webm');
 
   const meetingAttendeesInput = document.getElementById('meeting-attendees');
   const liveNotesTextarea = document.getElementById('live-notes');
@@ -715,11 +751,117 @@
   const btnCopy = document.getElementById('btn-copy');
   const btnDownload = document.getElementById('btn-download');
 
+  // Palabras vacías ignoradas al extraer el identificador de 1 palabra para el nombre de archivo
+  const TOPIC_STOPWORDS = new Set([
+    'reunion', 'reuniones', 'transcripcion', 'resumida', 'resumen', 'acta', 'sesion',
+    'seguimiento', 'proyecto', 'proyectos', 'nota', 'notas', 'note', 'ficha', 'ejecutiva',
+    'de', 'la', 'el', 'los', 'las', 'en', 'con', 'para', 'por', 'sobre', 'del', 'al',
+    'un', 'una', 'unos', 'unas', 'y', 'e', 'o', 'u', 'que', 'se', 'sin', 'sistema',
+    'sistemas', 'evaluados', 'evaluacion', 'titulo', 'conciso', 'representativo',
+    'analisis', 'informe', 'operativo', 'equipo', 'trabajo', 'llamada', 'videollamada',
+    'tema', 'asunto', 'punto', 'puntos', 'dia', 'hoy', 'ayer', 'general', 'estado'
+  ]);
+
+  function getFormattedTimestamp() {
+    return new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+  }
+
+  function sanitizeTopicSlug(rawWord) {
+    if (!rawWord) return '';
+    return rawWord
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '')
+      .slice(0, 15);
+  }
+
+  function extractFirstSignificantWord(textLine) {
+    if (!textLine) return '';
+    const cleanLine = textLine
+      .replace(/\[!NOTE\]/gi, ' ')
+      .replace(/\{\{FECHA\}\}/g, ' ')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+
+    const tokens = cleanLine.split(/[^a-z0-9]+/);
+    for (const token of tokens) {
+      if (token.length >= 2 && !/^\d+$/.test(token) && !TOPIC_STOPWORDS.has(token)) {
+        return token.slice(0, 15);
+      }
+    }
+    return '';
+  }
+
+  function extractMeetingTopicSlug(mdText) {
+    // Prioridad 1: Extraer del título generado por Gemini en el acta (Callout Obsidian, YAML o H1)
+    if (mdText && typeof mdText === 'string') {
+      const calloutMatch = mdText.match(/^>\s*\[!NOTE\][^\n]*?:\s*(.+)$/im);
+      if (calloutMatch && calloutMatch[1]) {
+        const w = extractFirstSignificantWord(calloutMatch[1]);
+        if (w) return w;
+      }
+
+      const yamlMatch = mdText.match(/^titulo:\s*["']?([^"'\n]+)["']?/im);
+      if (yamlMatch && yamlMatch[1]) {
+        const w = extractFirstSignificantWord(yamlMatch[1]);
+        if (w) return w;
+      }
+
+      const h1Match = mdText.match(/^#+\s+(.+)$/im);
+      if (h1Match && h1Match[1]) {
+        const w = extractFirstSignificantWord(h1Match[1]);
+        if (w) return w;
+      }
+    }
+
+    // Prioridad 2: Extraer de las notas rápidas tomadas durante la llamada
+    const notesText = liveNotesTextarea ? liveNotesTextarea.value.trim() : '';
+    if (notesText) {
+      const w = extractFirstSignificantWord(notesText);
+      if (w) return w;
+    }
+
+    // Prioridad 3: Extraer del campo de contexto / asistentes
+    const attendeesText = meetingAttendeesInput ? meetingAttendeesInput.value.trim() : '';
+    if (attendeesText) {
+      const w = extractFirstSignificantWord(attendeesText);
+      if (w) return w;
+    }
+
+    return '';
+  }
+
+  function buildExportFilename(extension) {
+    const slug = sanitizeTopicSlug(currentMeetingTopicSlug || extractMeetingTopicSlug(markdownResult));
+    const ts = (currentLoadedItem && currentLoadedItem.timestampStr)
+      ? currentLoadedItem.timestampStr
+      : getFormattedTimestamp();
+    return slug ? `${slug}-reunion-${ts}.${extension}` : `reunion-${ts}.${extension}`;
+  }
+
+  function triggerWebmDownload() {
+    if (!currentLoadedItem || currentLoadedItem.type !== 'audio') return;
+    const url = URL.createObjectURL(currentLoadedItem.data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = buildExportFilename('webm');
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+
+  // Protección contra cierre accidental de pestaña durante una grabación
   window.addEventListener('beforeunload', (e) => {
     if (mediaRecorder && (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused')) {
       e.preventDefault();
       e.returnValue = '';
     }
+  });
+
+  chkAutoDownloadWebm.addEventListener('change', () => {
+    safeStorage.setItem(STORAGE_KEYS.AUTO_DOWNLOAD_WEBM, chkAutoDownloadWebm.checked ? 'true' : 'false');
   });
 
   liveNotesTextarea.addEventListener('input', () => {
@@ -894,7 +1036,7 @@
     }
 
     if (liveNotes) {
-      finalPrompt += `\n\n[NOTAS DEL USUARIO TOMADAS EN TIEMPO REAL]:\nEl usuario registró los siguientes apuntes durante la llamada. Úsalos como referencia de ALTA PRIORIDAD para verificar acuerdos clave, siglas y tareas, e intégralos en la sección de notas del documento respetando estrictamente el formato de salida:\n${liveNotes}`;
+      finalPrompt += `\n\n[NOTAS DEL USUARIO TOMADAS EN TIEMPO REAL]:\nEl usuario registró los siguientes apuntes durante la llamada. Úsalos como referencia de ALTA PRIORIDAD para identificar el tema principal en el título, verificar acuerdos clave, siglas y tareas, e intégralos en la sección de notas del documento respetando estrictamente el formato de salida:\n${liveNotes}`;
     }
 
     return finalPrompt;
@@ -1009,6 +1151,9 @@
     const savedCaptureMode = safeStorage.getItem(STORAGE_KEYS.CAPTURE_MODE);
     if (savedCaptureMode) captureModeSelector.value = savedCaptureMode;
 
+    // Restaurar estado persistente del checkbox de autodescarga (false por defecto)
+    chkAutoDownloadWebm.checked = safeStorage.getItem(STORAGE_KEYS.AUTO_DOWNLOAD_WEBM) === 'true';
+
     const savedNotes = safeStorage.getItem(STORAGE_KEYS.LIVE_NOTES);
     if (savedNotes) liveNotesTextarea.value = savedNotes;
 
@@ -1035,7 +1180,9 @@
           currentLoadedItem = {
             type: 'audio',
             data: blob,
-            durationSecs: recovered.durationSecs || null
+            durationSecs: recovered.durationSecs || null,
+            timestampStr: recovered.timestampStr || getFormattedTimestamp(),
+            pendingAutoDownload: false
           };
           showRescueBox(blob, "Grabación recuperada automáticamente del disco local:");
         }
@@ -1176,6 +1323,8 @@
 
       combinedStream = dest.stream;
       audioChunks = [];
+      currentMeetingTopicSlug = '';
+      activeRecordingTimestampStr = getFormattedTimestamp();
       await clearBackupFromDisk();
 
       const mimeType = getSupportedMimeType();
@@ -1188,18 +1337,25 @@
         if (e.data && e.data.size > 0) {
           const chunkIdx = audioChunks.length;
           audioChunks.push(e.data);
-          saveChunkIncrementalToDisk(e.data, chunkIdx, mediaRecorder.mimeType, recordingElapsedSecs);
+          saveChunkIncrementalToDisk(e.data, chunkIdx, mediaRecorder.mimeType, recordingElapsedSecs, activeRecordingTimestampStr);
         }
       };
 
       mediaRecorder.onstop = async () => {
         const finalMime = mediaRecorder.mimeType || 'audio/webm';
+        const stopTimestamp = getFormattedTimestamp();
         const audioBlob = new Blob(audioChunks, { type: finalMime });
-        await saveFullBlobToDisk(audioBlob, finalMime, recordingElapsedSecs);
+        await saveFullBlobToDisk(audioBlob, finalMime, recordingElapsedSecs, stopTimestamp);
         audioChunks = [];
         await cleanupMediaResources();
 
-        currentLoadedItem = { type: 'audio', data: audioBlob, durationSecs: recordingElapsedSecs };
+        currentLoadedItem = {
+          type: 'audio',
+          data: audioBlob,
+          durationSecs: recordingElapsedSecs,
+          timestampStr: stopTimestamp,
+          pendingAutoDownload: true
+        };
         showRescueBox(audioBlob, "Grabación protegida en disco local:");
         processPipeline(currentLoadedItem);
       };
@@ -1366,7 +1522,7 @@
       const url = URL.createObjectURL(mp3Blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `reunion-${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.mp3`;
+      a.download = buildExportFilename('mp3');
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
       showOkMessage(`Audio convertido a MP3 correctamente (${(mp3Blob.size / (1024 * 1024)).toFixed(2)} MB).`);
@@ -1382,13 +1538,7 @@
   });
 
   btnDownloadAudio.addEventListener('click', () => {
-    if (!currentLoadedItem || currentLoadedItem.type !== 'audio') return;
-    const url = URL.createObjectURL(currentLoadedItem.data);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `reunion-${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.webm`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    triggerWebmDownload();
   });
 
   // ============================================================================
@@ -1414,6 +1564,7 @@
 
     const ext = file.name.split('.').pop().toLowerCase();
     const isTextFile = ['txt', 'md', 'csv'].includes(ext) || file.type.startsWith('text/');
+    const uploadTimestamp = getFormattedTimestamp();
 
     if (isTextFile) {
       updateStatus("Leyendo y optimizando archivo de transcripción...", 'idle');
@@ -1423,10 +1574,23 @@
         updateStatus("Listo", 'idle');
         return showError("El archivo de texto o CSV seleccionado está vacío.");
       }
-      currentLoadedItem = { type: 'text', data: textContent, filename: file.name, size: file.size };
+      currentLoadedItem = {
+        type: 'text',
+        data: textContent,
+        filename: file.name,
+        size: file.size,
+        timestampStr: uploadTimestamp,
+        pendingAutoDownload: false
+      };
       processPipeline(currentLoadedItem);
     } else {
-      currentLoadedItem = { type: 'audio', data: file, durationSecs: null };
+      currentLoadedItem = {
+        type: 'audio',
+        data: file,
+        durationSecs: null,
+        timestampStr: uploadTimestamp,
+        pendingAutoDownload: false
+      };
       showRescueBox(file, "Archivo de audio externo cargado:");
       processPipeline(currentLoadedItem);
     }
@@ -1439,6 +1603,7 @@
   btnClearRescue.addEventListener('click', async () => {
     await clearBackupFromDisk();
     currentLoadedItem = null;
+    currentMeetingTopicSlug = '';
     rescueBox.classList.add('hidden');
   });
 
@@ -1480,6 +1645,7 @@
       safeStorage.setItem(STORAGE_KEYS.CUSTOM_PROMPT, promptTextarea.value.trim());
     }
 
+    currentMeetingTopicSlug = '';
     const startTime = performance.now();
     btnStart.disabled = true;
     btnRetryAi.disabled = true;
@@ -1505,6 +1671,7 @@
       }
 
       markdownResult = ensureUserNotesInMarkdown(markdownResult);
+      currentMeetingTopicSlug = extractMeetingTopicSlug(markdownResult);
 
       const totalLatency = ((performance.now() - startTime) / 1000).toFixed(1);
       metricLatency.innerText = `${totalLatency} seg`;
@@ -1516,9 +1683,19 @@
 
     } catch (err) {
       console.error(err);
+      // Si falla la IA, extraer el tema desde las notas rápidas o asistentes para el nombre de archivo de respaldo
+      currentMeetingTopicSlug = extractMeetingTopicSlug('');
       showError("Error en el procesamiento: " + err.message + " (Tu grabación sigue protegida para descargar o reintentar).");
       updateStatus("Fallo en el procesamiento", 'idle');
     } finally {
+      // Ejecutar autodescarga posprocesado del .webm si procede (incluso si falló la red/API)
+      if (item && item.type === 'audio' && item.pendingAutoDownload === true) {
+        item.pendingAutoDownload = false;
+        if (chkAutoDownloadWebm && chkAutoDownloadWebm.checked) {
+          triggerWebmDownload();
+        }
+      }
+
       btnStart.disabled = false;
       btnRetryAi.disabled = false;
       btnProcessFile.disabled = false;
@@ -1740,7 +1917,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `acta-reunion-${new Date().toISOString().slice(0,10)}.md`;
+    a.download = buildExportFilename('md');
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   });
