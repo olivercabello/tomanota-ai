@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📝 TomaNota AI v7.5 - Grabador & Analizador de Reuniones (Edición Estable)</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9a4 4 0 0 1 8 0c0 2-1 3-2 4s-1 2-1 3a1 1 0 0 1-2 0c0-1.5.5-2.5 1.5-3.5S12 10.5 12 9a2 2 0 1 0-4 0v1'%3E%3C/path%3E%3Cpath d='M16 8a5 5 0 0 1 0 8' stroke='%2360a5fa'%3E%3C/path%3E%3Cpath d='M18.5 5.5a8 8 0 0 1 0 13' stroke='%2393c5fd'%3E%3C/path%3E%3C/svg%3E">
+  <title>TomaNota AI v7.5 - Grabador & Analizador de Reuniones (Edición Estable)</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z' fill='%231e293b'%3E%3C/path%3E%3Cpath d='M14 2v4a2 2 0 0 0 2 2h4' stroke='%233b82f6'%3E%3C/path%3E%3Cpath d='M10 13H8' stroke='%2393c5fd'%3E%3C/path%3E%3Cpath d='M16 13H8' stroke='%2393c5fd'%3E%3C/path%3E%3Cpath d='M10 17H8' stroke='%2393c5fd'%3E%3C/path%3E%3C/svg%3E">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js" defer></script>
   <style>
@@ -209,14 +209,18 @@
     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
       <div style="display: flex; align-items: center; gap: 1rem;">
         <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid #3b82f6; border-radius: 14px; padding: 0.65rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(59, 130, 246, 0.25);">
-          <!-- Flaticon Mejorado: Oreja con ondas de escucha en colores destacados -->
+          <!-- Flaticon de Notas: Documento/Portapapeles con líneas de texto y lápiz en colores destacados -->
           <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <!-- Silueta principal de la oreja -->
-            <path d="M6 9a4 4 0 0 1 8 0c0 2-1 3-2 4s-1 2-1 3a1 1 0 0 1-2 0c0-1.5.5-2.5 1.5-3.5S12 10.5 12 9a2 2 0 1 0-4 0v1" stroke="#3b82f6"></path>
-            <!-- Onda interna de audio (Cian brillante) -->
-            <path d="M16 8a5 5 0 0 1 0 8" stroke="#38bdf8"></path>
-            <!-- Onda externa de audio (Azul claro luminoso) -->
-            <path d="M18.5 5.5a8 8 0 0 1 0 13" stroke="#93c5fd"></path>
+            <!-- Cuerpo del documento / Bloc de notas -->
+            <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" fill="#0f172a" stroke="#3b82f6"></path>
+            <!-- Esquina doblada del papel -->
+            <path d="M14 2v4a2 2 0 0 0 2 2h4" stroke="#3b82f6"></path>
+            <!-- Líneas de texto simuladas (Cian brillante) -->
+            <path d="M10 13H8" stroke="#38bdf8"></path>
+            <path d="M16 13H8" stroke="#38bdf8"></path>
+            <path d="M10 17H8" stroke="#38bdf8"></path>
+            <!-- Lápiz o trazo superpuesto indicando acción de escribir -->
+            <path d="M17 14l-2.5 2.5L13 17l.5-1.5L16 13z" fill="#38bdf8" stroke="#38bdf8"></path>
           </svg>
         </div>
         <div>
