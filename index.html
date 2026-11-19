@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TomaNota AI v7.5 - Grabador & Analizador de Reuniones (Edición Estable)</title>
+  <title>TomaNota AI v7.6 - Grabador & Analizador de Reuniones (Edición Estable)</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z' fill='%231e293b'%3E%3C/path%3E%3Cpath d='M14 2v4a2 2 0 0 0 2 2h4' stroke='%233b82f6'%3E%3C/path%3E%3Cpath d='M10 13H8' stroke='%2393c5fd'%3E%3C/path%3E%3Cpath d='M16 13H8' stroke='%2393c5fd'%3E%3C/path%3E%3Cpath d='M10 17H8' stroke='%2393c5fd'%3E%3C/path%3E%3C/svg%3E">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js" defer></script>
@@ -186,7 +186,7 @@
       </div>
       <div>
         <h1 style="font-size: 1.5rem;">TomaNota AI</h1>
-        <p style="font-size: 0.85rem;">Configuración de Google Gemini API (Edición Estable v7.5)</p>
+        <p style="font-size: 0.85rem;">Configuración de Google Gemini API (Edición Estable v7.6)</p>
       </div>
     </div>
     <p>Introduce tu clave de Google AI Studio. Se validará y guardará localmente en tu navegador.</p>
@@ -225,9 +225,9 @@
         </div>
         <div>
           <h1 style="display: flex; align-items: center; gap: 0.5rem;">
-            TomaNota AI <span style="font-size: 0.75rem; background: var(--success); color: white; padding: 0.1rem 0.45rem; border-radius: 6px;">v7.5 Estable</span>
+            TomaNota AI <span style="font-size: 0.75rem; background: var(--success); color: white; padding: 0.1rem 0.45rem; border-radius: 6px;">v7.6 Estable</span>
           </h1>
-          <p>Captura de bajo consumo (16 kbps), autoguardado incremental en disco, autodescarga inteligente y soporte Obsidian.</p>
+          <p>Captura de bajo consumo (16 kbps), exportación en Ogg/Opus, autoguardado incremental en disco, autodescarga inteligente y soporte Obsidian.</p>
         </div>
       </div>
       <button type="button" class="btn-outline btn-sm" id="btn-logout" onclick="handleLogoutClick()">Cambiar API Key</button>
@@ -252,10 +252,10 @@
       </div>
     </div>
 
-    <!-- OPCIÓN PERSISTENTE DE AUTODESCARGA WEBM -->
+    <!-- OPCIÓN PERSISTENTE DE AUTODESCARGA DE AUDIO (.OGG) -->
     <div class="checkbox-group">
       <input type="checkbox" id="chk-auto-download-webm">
-      <label for="chk-auto-download-webm">Marcar si deseas descargar archivo <code>.webm</code> automáticamente tras procesar la reunión (con prefijo del tema detectado)</label>
+      <label for="chk-auto-download-webm">Marcar si deseas descargar el archivo de audio <code>.ogg</code> automáticamente tras procesar la reunión (con prefijo del tema detectado)</label>
     </div>
 
     <!-- PANEL DE CONTEXTO Y NOTAS EN DIRECTO -->
@@ -298,8 +298,8 @@
 
     <!-- SECCIÓN DE SUBIDA DE ARCHIVOS -->
     <div id="upload-section" class="panel-section hidden">
-      <label for="file-input" style="margin-bottom: 0.4rem;">Seleccionar Transcripción (.csv de LiveCaptions, .txt, .md) o Grabación de Audio (.webm, .mp3, .wav, .m4a, .ogg):</label>
-      <input type="file" id="file-input" accept="audio/*,.txt,.md,.csv,text/plain,text/csv,text/markdown">
+      <label for="file-input" style="margin-bottom: 0.4rem;">Seleccionar Transcripción (.csv de LiveCaptions, .txt, .md) o Grabación de Audio (.ogg, .webm, .mp3, .wav, .m4a):</label>
+      <input type="file" id="file-input" accept="audio/*,.ogg,.webm,.txt,.md,.csv,text/plain,text/csv,text/markdown">
       <div class="actions" style="margin-top: 0.6rem;">
         <button type="button" class="btn-primary" id="btn-process-file">Analizar Archivo Subido</button>
       </div>
@@ -320,14 +320,14 @@
       </div>
     </div>
 
-    <!-- CAJA DE RESCATE Y EXPORTACIÓN MP3 -->
+    <!-- CAJA DE RESCATE Y EXPORTACIÓN OGG / MP3 -->
     <div id="rescue-box" class="rescue-box hidden">
       <div>
         <strong style="color: #c7d2fe;" id="rescue-title">Grabación protegida en disco local:</strong>
         <p style="font-size: 0.84rem; color: #a5b4fc;" id="rescue-info">Tamaño: 0 MB</p>
       </div>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <button type="button" class="btn-warning" id="btn-download-audio">Descargar Original (.webm)</button>
+        <button type="button" class="btn-warning" id="btn-download-audio">Descargar Audio (.ogg)</button>
         <button type="button" class="btn-success" id="btn-download-mp3">Convertir a MP3 (16 kHz)</button>
         <button type="button" class="btn-primary" id="btn-retry-ai">Procesar con Gemini</button>
         <button type="button" class="btn-outline btn-sm" id="btn-clear-rescue">Limpiar</button>
@@ -371,7 +371,7 @@
 </div>
 
 <footer>
-  <p><strong>TomaNota AI v7.5</strong> — Desarrollado por <strong>Oliver Cabello</strong> & <strong>Alejandro Jara</strong> | <a href="https://github.com/olivercabello/tomanota-ai" target="_blank">Repositorio en GitHub</a></p>
+  <p><strong>TomaNota AI v7.6</strong> — Desarrollado por <strong>Oliver Cabello</strong> & <strong>Alejandro Jara</strong> | <a href="https://github.com/olivercabello/tomanota-ai" target="_blank">Repositorio en GitHub</a></p>
   <p style="font-size: 0.75rem; color: #64748b; max-width: 700px; margin: 0 auto;">
     <em>Disclaimer:</em> Esta herramienta procesa audio y texto localmente mediante la API de Google Gemini utilizando tu propia clave personal. Los autores no almacenan, recopilan ni tienen acceso a ninguna grabación, transcripción o clave introducida en la aplicación.
   </p>
@@ -582,10 +582,11 @@
     return dbInstancePromise;
   }
 
-  async function saveChunkIncrementalToDisk(chunkBlob, chunkIndex, mimeType, elapsedSecs, timestampStr) {
+  async function saveChunkIncrementalToDisk(chunkBlob, chunkIndex, mimeType, elapsedSecs, timestampStr, expectedRecId = null) {
     try {
       const db = await getBackupDB();
       if (!db) return;
+      if (expectedRecId !== null && expectedRecId !== activeRecordingId) return;
       const tx = db.transaction(STORE_NAME, 'readwrite');
       const store = tx.objectStore(STORE_NAME);
       const chunkKey = `chunk_${String(chunkIndex).padStart(6, '0')}`;
@@ -604,17 +605,22 @@
     try {
       const db = await getBackupDB();
       if (!db) return;
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
-      store.clear();
-      store.put(blob, 'chunk_000000');
-      store.put({
-        count: 1,
-        mimeType: mimeType || blob.type || 'audio/webm',
-        durationSecs: elapsedSecs,
-        timestampStr: timestampStr,
-        updatedAt: Date.now()
-      }, META_KEY);
+      return new Promise((resolve) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.clear();
+        store.put(blob, 'chunk_000000');
+        store.put({
+          count: 1,
+          mimeType: mimeType || blob.type || 'audio/ogg',
+          durationSecs: elapsedSecs,
+          timestampStr: timestampStr,
+          updatedAt: Date.now()
+        }, META_KEY);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+        tx.onabort = () => resolve();
+      });
     } catch (e) {}
   }
 
@@ -677,6 +683,732 @@
   }
 
   // ============================================================================
+  // 2B. REMUXER PURO WEBM/OPUS -> OGG/OPUS (SIN RECODIFICACIÓN, RFC 7845)
+  // ============================================================================
+  const OGG_CRC_TABLE = (() => {
+    const table = new Uint32Array(256);
+    for (let i = 0; i < 256; i++) {
+      let r = (i << 24) >>> 0;
+      for (let j = 0; j < 8; j++) {
+        r = (r & 0x80000000) ? (((r << 1) ^ 0x04C11DB7) >>> 0) : ((r << 1) >>> 0);
+      }
+      table[i] = r;
+    }
+    return table;
+  })();
+
+  function computeOggCrc32(bytes) {
+    let crc = 0;
+    for (let i = 0; i < bytes.length; i++) {
+      crc = ((crc << 8) ^ OGG_CRC_TABLE[((crc >>> 24) ^ bytes[i]) & 0xFF]) >>> 0;
+    }
+    return crc >>> 0;
+  }
+
+  async function detectAudioContainer(blob) {
+    if (!blob || blob.size < 4) return 'other';
+    try {
+      const head = new Uint8Array(await blob.slice(0, 4).arrayBuffer());
+      if (head[0] === 0x4F && head[1] === 0x67 && head[2] === 0x67 && head[3] === 0x53) return 'ogg';
+      if (head[0] === 0x1A && head[1] === 0x45 && head[2] === 0xDF && head[3] === 0xA3) return 'webm';
+    } catch (e) {}
+    return 'other';
+  }
+
+  function getAudioExtensionForBlob(blob, fallbackFilename = '') {
+    const cleanMime = ((blob && blob.type) || '').split(';')[0].trim().toLowerCase();
+    const mimeToExt = {
+      'audio/ogg': 'ogg',
+      'application/ogg': 'ogg',
+      'audio/opus': 'ogg',
+      'audio/webm': 'webm',
+      'video/webm': 'webm',
+      'audio/mpeg': 'mp3',
+      'audio/mp3': 'mp3',
+      'audio/wav': 'wav',
+      'audio/x-wav': 'wav',
+      'audio/wave': 'wav',
+      'audio/mp4': 'm4a',
+      'video/mp4': 'mp4',
+      'audio/x-m4a': 'm4a',
+      'audio/m4a': 'm4a',
+      'audio/aac': 'aac',
+      'audio/x-aac': 'aac',
+      'audio/flac': 'flac',
+      'audio/x-flac': 'flac'
+    };
+    if (mimeToExt[cleanMime]) return mimeToExt[cleanMime];
+    if (fallbackFilename && fallbackFilename.includes('.')) {
+      const ext = fallbackFilename.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (ext) return ext;
+    }
+    return 'ogg';
+  }
+
+  function getMimeTypeForExtension(ext) {
+    const extToMime = {
+      ogg: 'audio/ogg',
+      opus: 'audio/ogg',
+      webm: 'audio/webm',
+      mp3: 'audio/mp3',
+      wav: 'audio/wav',
+      m4a: 'audio/mp4',
+      mp4: 'audio/mp4',
+      aac: 'audio/aac',
+      flac: 'audio/flac'
+    };
+    return extToMime[(ext || '').toLowerCase()] || 'audio/ogg';
+  }
+
+  function getAudioFormatLabel(blob, ext, remuxed = false) {
+    const cleanMime = ((blob && blob.type) || '').split(';')[0].trim().toLowerCase();
+    if (ext === 'ogg' || cleanMime === 'audio/ogg') {
+      return remuxed ? 'Ogg/Opus (.ogg, remux sin recodificar)' : 'Ogg/Opus (.ogg)';
+    }
+    return cleanMime ? `${cleanMime} (.${ext})` : `.${ext}`;
+  }
+
+  // Utilidades binarias EBML / Matroska (RFC 8794)
+  const WEBM_SEGMENT_LEVEL_IDS = new Set([
+    0x1A45DFA3, // EBML
+    0x18538067, // Segment
+    0x114D9B74, // SeekHead
+    0x1549A966, // Info
+    0x1F43B675, // Cluster
+    0x1654AE6B, // Tracks
+    0x1C53BB6B, // Cues
+    0x1941A469, // Attachments
+    0x1043A770, // Chapters
+    0x1254C367  // Tags
+  ]);
+
+  function readEbmlVintId(buf, pos, end) {
+    if (pos >= end) return null;
+    const first = buf[pos];
+    if (first === 0) return null;
+    let mask = 0x80;
+    let length = 1;
+    while (length <= 4 && (first & mask) === 0) {
+      mask >>= 1;
+      length++;
+    }
+    if (length > 4 || pos + length > end) return null;
+    let id = 0;
+    for (let i = 0; i < length; i++) {
+      id = (id * 256) + buf[pos + i];
+    }
+    return { id, length };
+  }
+
+  function readEbmlVintSize(buf, pos, end) {
+    if (pos >= end) return null;
+    const first = buf[pos];
+    if (first === 0) return null;
+    let mask = 0x80;
+    let length = 1;
+    while (length <= 8 && (first & mask) === 0) {
+      mask >>= 1;
+      length++;
+    }
+    if (length > 8 || pos + length > end) return null;
+    const dataMask = mask - 1;
+    const firstVal = first & dataMask;
+    let allOnes = (firstVal === dataMask);
+    let size = firstVal;
+    for (let i = 1; i < length; i++) {
+      const b = buf[pos + i];
+      if (b !== 0xFF) allOnes = false;
+      size = (size * 256) + b;
+    }
+    return { size, length, unknown: allOnes };
+  }
+
+  function readUintBE(buf, pos, len) {
+    let val = 0;
+    for (let i = 0; i < len; i++) {
+      val = (val * 256) + buf[pos + i];
+    }
+    return val;
+  }
+
+  function readIntBE(buf, pos, len) {
+    if (len <= 0) return 0;
+    const isNeg = (buf[pos] & 0x80) !== 0;
+    let val = 0;
+    for (let i = 0; i < len; i++) {
+      val = (val * 256) + (isNeg ? (buf[pos + i] ^ 0xFF) : buf[pos + i]);
+    }
+    return isNeg ? -(val + 1) : val;
+  }
+
+  function readFloatBE(buf, pos, len) {
+    const view = new DataView(buf.buffer, buf.byteOffset + pos, len);
+    if (len === 4) return view.getFloat32(0, false);
+    if (len === 8) return view.getFloat64(0, false);
+    return 0;
+  }
+
+  function readAscii(buf, pos, len) {
+    let out = '';
+    for (let i = 0; i < len; i++) {
+      const c = buf[pos + i];
+      if (c === 0) break;
+      out += String.fromCharCode(c);
+    }
+    return out;
+  }
+
+  // Cálculo exacto de muestras @ 48 kHz a partir del byte TOC del paquete Opus (RFC 6716 §3.1-3.2)
+  function getOpusPacketSamples(packet) {
+    if (!packet || packet.length === 0) return 0;
+    const toc = packet[0];
+    const config = toc >> 3;
+    let frameSamples;
+    if (config < 12) {
+      const rem = config & 0x03;
+      frameSamples = rem === 0 ? 480 : rem === 1 ? 960 : rem === 2 ? 1920 : 2880;
+    } else if (config < 16) {
+      frameSamples = (config & 0x01) === 0 ? 480 : 960;
+    } else {
+      const rem = config & 0x03;
+      frameSamples = rem === 0 ? 120 : rem === 1 ? 240 : rem === 2 ? 480 : 960;
+    }
+    const code = toc & 0x03;
+    let frameCount;
+    if (code === 0) {
+      frameCount = 1;
+    } else if (code === 1 || code === 2) {
+      frameCount = 2;
+    } else {
+      if (packet.length < 2) return frameSamples;
+      frameCount = packet[1] & 0x3F;
+      if (frameCount <= 0) frameCount = 1;
+    }
+    return frameSamples * frameCount;
+  }
+
+  function parseWebmTrackEntries(buf, start, end) {
+    let pos = start;
+    let opusTrack = null;
+    while (pos < end) {
+      const idObj = readEbmlVintId(buf, pos, end);
+      if (!idObj) break;
+      const sizeObj = readEbmlVintSize(buf, pos + idObj.length, end);
+      if (!sizeObj || sizeObj.unknown) break;
+      const dataStart = pos + idObj.length + sizeObj.length;
+      const elemEnd = Math.min(end, dataStart + sizeObj.size);
+
+      if (idObj.id === 0xAE) { // TrackEntry
+        const track = {
+          trackNumber: 0,
+          trackType: 0,
+          codecId: '',
+          codecPrivate: null,
+          codecDelayNs: 0,
+          channels: 1,
+          samplingFrequency: 48000
+        };
+        let tPos = dataStart;
+        while (tPos < elemEnd) {
+          const tId = readEbmlVintId(buf, tPos, elemEnd);
+          if (!tId) break;
+          const tSize = readEbmlVintSize(buf, tPos + tId.length, elemEnd);
+          if (!tSize || tSize.unknown) break;
+          const tData = tPos + tId.length + tSize.length;
+          const tEnd = Math.min(elemEnd, tData + tSize.size);
+
+          if (tId.id === 0xD7) track.trackNumber = readUintBE(buf, tData, tEnd - tData);
+          else if (tId.id === 0x83) track.trackType = readUintBE(buf, tData, tEnd - tData);
+          else if (tId.id === 0x86) track.codecId = readAscii(buf, tData, tEnd - tData);
+          else if (tId.id === 0x63A2) track.codecPrivate = buf.subarray(tData, tEnd);
+          else if (tId.id === 0x56AA) track.codecDelayNs = readUintBE(buf, tData, tEnd - tData);
+          else if (tId.id === 0xE1) { // Audio
+            let aPos = tData;
+            while (aPos < tEnd) {
+              const aId = readEbmlVintId(buf, aPos, tEnd);
+              if (!aId) break;
+              const aSize = readEbmlVintSize(buf, aPos + aId.length, tEnd);
+              if (!aSize || aSize.unknown) break;
+              const aData = aPos + aId.length + aSize.length;
+              const aEnd = Math.min(tEnd, aData + aSize.size);
+              if (aId.id === 0x9F) track.channels = readUintBE(buf, aData, aEnd - aData) || 1;
+              else if (aId.id === 0xB5) track.samplingFrequency = readFloatBE(buf, aData, aEnd - aData) || 48000;
+              aPos = aEnd;
+            }
+          }
+          tPos = tEnd;
+        }
+        if (track.codecId === 'A_OPUS' && track.trackNumber > 0 && !opusTrack) {
+          opusTrack = track;
+        }
+      }
+      pos = elemEnd;
+    }
+    return opusTrack;
+  }
+
+  function parseWebmBlockFrames(buf, start, end, targetTrackNumber) {
+    const trackVint = readEbmlVintSize(buf, start, end);
+    if (!trackVint || trackVint.size !== targetTrackNumber) return null;
+    let offset = start + trackVint.length;
+    if (offset + 3 > end) return null; // 2 bytes timecode + 1 byte flags
+    const flags = buf[offset + 2];
+    offset += 3;
+
+    const lacing = (flags >> 1) & 0x03;
+    if (lacing === 0) {
+      return offset < end ? [buf.subarray(offset, end)] : [];
+    }
+
+    if (offset >= end) return null;
+    const frameCount = buf[offset++] + 1;
+    const frames = [];
+
+    if (lacing === 2) {
+      const remaining = end - offset;
+      if (remaining < 0 || remaining % frameCount !== 0) return null;
+      const frameSize = remaining / frameCount;
+      for (let i = 0; i < frameCount; i++) {
+        if (frameSize > 0) frames.push(buf.subarray(offset, offset + frameSize));
+        offset += frameSize;
+      }
+      return frames;
+    }
+
+    const sizes = new Array(frameCount);
+    if (lacing === 1) {
+      for (let i = 0; i < frameCount - 1; i++) {
+        let fSize = 0;
+        let terminated = false;
+        while (offset < end) {
+          const b = buf[offset++];
+          fSize += b;
+          if (b !== 255) {
+            terminated = true;
+            break;
+          }
+        }
+        if (!terminated) return null;
+        sizes[i] = fSize;
+      }
+    } else if (lacing === 3 && frameCount > 1) {
+      const first = readEbmlVintSize(buf, offset, end);
+      if (!first) return null;
+      offset += first.length;
+      let curSize = first.size;
+      sizes[0] = curSize;
+      for (let i = 1; i < frameCount - 1; i++) {
+        const deltaVint = readEbmlVintSize(buf, offset, end);
+        if (!deltaVint) return null;
+        offset += deltaVint.length;
+        const bias = Math.pow(2, (7 * deltaVint.length) - 1) - 1;
+        curSize += (deltaVint.size - bias);
+        if (curSize < 0) return null;
+        sizes[i] = curSize;
+      }
+    }
+
+    let consumed = 0;
+    for (let i = 0; i < frameCount - 1; i++) consumed += sizes[i];
+    const lastSize = (end - offset) - consumed;
+    if (lastSize < 0) return null;
+    sizes[frameCount - 1] = lastSize;
+
+    for (let i = 0; i < frameCount; i++) {
+      const s = sizes[i];
+      if (offset + s > end) return null;
+      if (s > 0) frames.push(buf.subarray(offset, offset + s));
+      offset += s;
+    }
+    return frames;
+  }
+
+  function buildOpusHead(track) {
+    if (track.codecPrivate && track.codecPrivate.length >= 19) {
+      const cp = track.codecPrivate;
+      if (
+        cp[0] === 0x4F && cp[1] === 0x70 && cp[2] === 0x75 && cp[3] === 0x73 &&
+        cp[4] === 0x48 && cp[5] === 0x65 && cp[6] === 0x61 && cp[7] === 0x64
+      ) {
+        const copy = new Uint8Array(cp.length);
+        copy.set(cp);
+        copy[8] = 1;
+        return copy;
+      }
+    }
+    const head = new Uint8Array(19);
+    const view = new DataView(head.buffer);
+    const sig = 'OpusHead';
+    for (let i = 0; i < 8; i++) head[i] = sig.charCodeAt(i);
+    head[8] = 1;
+    head[9] = (track.channels >= 1 && track.channels <= 255) ? track.channels : 1;
+    const preSkip = track.codecDelayNs > 0
+      ? Math.min(65535, Math.round((track.codecDelayNs * 48) / 1e6))
+      : 312;
+    view.setUint16(10, preSkip, true);
+    const inputRate = track.samplingFrequency > 0 ? Math.round(track.samplingFrequency) : 48000;
+    view.setUint32(12, inputRate >>> 0, true);
+    view.setInt16(16, 0, true);
+    head[18] = 0;
+    return head;
+  }
+
+  function buildOpusTags(vendorStr = 'TomaNota AI') {
+    const vendorBytes = new TextEncoder().encode(vendorStr);
+    const tags = new Uint8Array(8 + 4 + vendorBytes.length + 4);
+    const view = new DataView(tags.buffer);
+    const sig = 'OpusTags';
+    for (let i = 0; i < 8; i++) tags[i] = sig.charCodeAt(i);
+    view.setUint32(8, vendorBytes.length, true);
+    tags.set(vendorBytes, 12);
+    view.setUint32(12 + vendorBytes.length, 0, true);
+    return tags;
+  }
+
+  function createOggPage(headerType, granulePos, serial, seqNo, segments, bodyChunks, bodyLength) {
+    const pageSize = 27 + segments.length + bodyLength;
+    const page = new Uint8Array(pageSize);
+    const view = new DataView(page.buffer);
+
+    page[0] = 0x4F; page[1] = 0x67; page[2] = 0x67; page[3] = 0x53; // OggS
+    page[4] = 0;
+    page[5] = headerType;
+
+    if (granulePos < 0) {
+      view.setUint32(6, 0xFFFFFFFF, true);
+      view.setUint32(10, 0xFFFFFFFF, true);
+    } else {
+      view.setUint32(6, granulePos >>> 0, true);
+      view.setUint32(10, Math.floor(granulePos / 4294967296) >>> 0, true);
+    }
+
+    view.setUint32(14, serial >>> 0, true);
+    view.setUint32(18, seqNo >>> 0, true);
+    view.setUint32(22, 0, true);
+    page[26] = segments.length;
+
+    for (let i = 0; i < segments.length; i++) {
+      page[27 + i] = segments[i];
+    }
+
+    let offset = 27 + segments.length;
+    for (let i = 0; i < bodyChunks.length; i++) {
+      page.set(bodyChunks[i], offset);
+      offset += bodyChunks[i].length;
+    }
+
+    view.setUint32(22, computeOggCrc32(page), true);
+    return page;
+  }
+
+  function createOggOpusMuxer(opusHead) {
+    const serial = ((Math.random() * 0xFFFFFFFF) >>> 0) || 0x544E4149;
+    const preSkip = opusHead.length >= 12 ? (opusHead[10] | (opusHead[11] << 8)) : 312;
+    const pages = [];
+    let seqNo = 0;
+    let totalGranule = 0;
+    let lastFlushedGranule = 0;
+    let packetCount = 0;
+
+    function emitSinglePacketPages(packet, baseHeaderType, granulePos) {
+      const maxChunk = 255 * 255;
+      let offset = 0;
+      let isContinued = false;
+      while (true) {
+        const remaining = packet.length - offset;
+        const isLastSlice = remaining < maxChunk;
+        const sliceLen = isLastSlice ? remaining : maxChunk;
+        const slice = packet.subarray(offset, offset + sliceLen);
+        const segs = [];
+        let left = sliceLen;
+        while (left >= 255) {
+          segs.push(255);
+          left -= 255;
+        }
+        if (isLastSlice) segs.push(left);
+        const hType = (isContinued ? 0x01 : 0x00) | (isLastSlice ? baseHeaderType : 0x00);
+        const gp = isLastSlice ? granulePos : -1;
+        pages.push(createOggPage(hType, gp, serial, seqNo++, segs, [slice], slice.length));
+        if (isLastSlice) break;
+        offset += sliceLen;
+        isContinued = true;
+      }
+    }
+
+    // Página 0 (BOS): OpusHead | Página 1: OpusTags
+    emitSinglePacketPages(opusHead, 0x02, 0);
+    emitSinglePacketPages(buildOpusTags('TomaNota AI'), 0x00, 0);
+
+    let pendingSegments = [];
+    let pendingChunks = [];
+    let pendingBodyLen = 0;
+    let pendingSamples = 0;
+    let lastPacketSamples = 0;
+    let lastDiscardPaddingNs = 0;
+    const MAX_SAMPLES_PER_PAGE = 48000; // ~1 s por página Ogg
+
+    function flushPending(isEos) {
+      if (pendingChunks.length === 0) return;
+      let pageGranule = totalGranule;
+      if (isEos && lastDiscardPaddingNs > 0) {
+        const discardSamples = Math.round((lastDiscardPaddingNs * 48) / 1e6);
+        const minGranule = Math.max(lastFlushedGranule + 1, Math.min(totalGranule, preSkip + 1));
+        const maxTrim = Math.min(lastPacketSamples, Math.max(0, totalGranule - minGranule));
+        const trim = Math.max(0, Math.min(discardSamples, maxTrim));
+        pageGranule = Math.max(minGranule, totalGranule - trim);
+      }
+      pages.push(createOggPage(isEos ? 0x04 : 0x00, pageGranule, serial, seqNo++, pendingSegments, pendingChunks, pendingBodyLen));
+      lastFlushedGranule = pageGranule;
+      pendingSegments = [];
+      pendingChunks = [];
+      pendingBodyLen = 0;
+      pendingSamples = 0;
+    }
+
+    return {
+      pushPacket(packet, discardPaddingNs = 0) {
+        if (!packet || packet.length === 0) return;
+        const samples = getOpusPacketSamples(packet);
+        if (samples <= 0) return;
+
+        const neededSegs = Math.floor(packet.length / 255) + 1;
+        if (neededSegs > 255) {
+          flushPending(false);
+          totalGranule += samples;
+          lastPacketSamples = samples;
+          lastDiscardPaddingNs = discardPaddingNs;
+          packetCount++;
+          emitSinglePacketPages(packet, 0x00, totalGranule);
+          lastFlushedGranule = totalGranule;
+          return;
+        }
+
+        if (pendingChunks.length > 0 && (pendingSegments.length + neededSegs > 255 || pendingSamples >= MAX_SAMPLES_PER_PAGE)) {
+          flushPending(false);
+        }
+
+        let left = packet.length;
+        while (left >= 255) {
+          pendingSegments.push(255);
+          left -= 255;
+        }
+        pendingSegments.push(left);
+        pendingChunks.push(packet);
+        pendingBodyLen += packet.length;
+        pendingSamples += samples;
+        totalGranule += samples;
+        lastPacketSamples = samples;
+        lastDiscardPaddingNs = discardPaddingNs;
+        packetCount++;
+      },
+
+      finish() {
+        if (packetCount === 0) return null;
+        if (pendingChunks.length > 0) {
+          flushPending(true);
+        } else if (pages.length >= 3) {
+          const lastPage = pages[pages.length - 1];
+          lastPage[5] |= 0x04;
+          const view = new DataView(lastPage.buffer, lastPage.byteOffset, lastPage.byteLength);
+          view.setUint32(22, 0, true);
+          view.setUint32(22, computeOggCrc32(lastPage), true);
+        }
+        return {
+          blob: new Blob(pages, { type: 'audio/ogg' }),
+          packetCount,
+          durationSecs: Math.max(0, (lastFlushedGranule - preSkip) / 48000)
+        };
+      }
+    };
+  }
+
+  function processWebmCluster(buf, start, limit, unknownSize, targetTrackNumber, muxer) {
+    let pos = start;
+    while (pos < limit) {
+      const prevPos = pos;
+      const idObj = readEbmlVintId(buf, pos, limit);
+      if (!idObj) break;
+      if (unknownSize && WEBM_SEGMENT_LEVEL_IDS.has(idObj.id)) break;
+      const sizeObj = readEbmlVintSize(buf, pos + idObj.length, limit);
+      if (!sizeObj || sizeObj.unknown) break;
+      const dataStart = pos + idObj.length + sizeObj.length;
+      const elemEnd = dataStart + sizeObj.size;
+      if (elemEnd > limit) break; // Bloque truncado al final (ej. cierre abrupto)
+
+      if (muxer) {
+        if (idObj.id === 0xA3) { // SimpleBlock
+          const frames = parseWebmBlockFrames(buf, dataStart, elemEnd, targetTrackNumber);
+          if (frames) {
+            for (let i = 0; i < frames.length; i++) muxer.pushPacket(frames[i], 0);
+          }
+        } else if (idObj.id === 0xA0) { // BlockGroup
+          let gPos = dataStart;
+          let blockFrames = null;
+          let discardNs = 0;
+          while (gPos < elemEnd) {
+            const gId = readEbmlVintId(buf, gPos, elemEnd);
+            if (!gId) break;
+            const gSize = readEbmlVintSize(buf, gPos + gId.length, elemEnd);
+            if (!gSize || gSize.unknown) break;
+            const gData = gPos + gId.length + gSize.length;
+            const gEnd = gData + gSize.size;
+            if (gEnd > elemEnd) break;
+            if (gId.id === 0xA1) { // Block
+              blockFrames = parseWebmBlockFrames(buf, gData, gEnd, targetTrackNumber);
+            } else if (gId.id === 0x75A2) { // DiscardPadding (signed ns)
+              discardNs = readIntBE(buf, gData, gSize.size);
+            }
+            gPos = gEnd;
+          }
+          if (blockFrames && blockFrames.length > 0) {
+            for (let i = 0; i < blockFrames.length - 1; i++) muxer.pushPacket(blockFrames[i], 0);
+            muxer.pushPacket(blockFrames[blockFrames.length - 1], discardNs);
+          }
+        }
+      }
+      pos = elemEnd;
+      if (pos <= prevPos) break;
+    }
+    return pos;
+  }
+
+  async function remuxWebmOpusToOgg(webmBlob) {
+    const arrayBuffer = await webmBlob.arrayBuffer();
+    const buf = new Uint8Array(arrayBuffer);
+    if (buf.length < 16) return null;
+    if (buf[0] !== 0x1A || buf[1] !== 0x45 || buf[2] !== 0xDF || buf[3] !== 0xA3) return null;
+
+    let opusTrack = null;
+    let muxer = null;
+    const deferredClusters = [];
+    let clusterCounter = 0;
+    let pos = 0;
+
+    while (pos < buf.length) {
+      const prevPos = pos;
+      const topId = readEbmlVintId(buf, pos, buf.length);
+      if (!topId) break;
+      const topSize = readEbmlVintSize(buf, pos + topId.length, buf.length);
+      if (!topSize) break;
+      const topDataStart = pos + topId.length + topSize.length;
+
+      if (topId.id === 0x18538067) { // Segment
+        const segEnd = topSize.unknown ? buf.length : Math.min(buf.length, topDataStart + topSize.size);
+        let sPos = topDataStart;
+
+        while (sPos < segEnd) {
+          const prevSPos = sPos;
+          const idObj = readEbmlVintId(buf, sPos, segEnd);
+          if (!idObj) break;
+          if (topSize.unknown && (idObj.id === 0x1A45DFA3 || idObj.id === 0x18538067)) break;
+          const sizeObj = readEbmlVintSize(buf, sPos + idObj.length, segEnd);
+          if (!sizeObj) break;
+          const dataStart = sPos + idObj.length + sizeObj.length;
+
+          if (idObj.id === 0x1654AE6B) { // Tracks
+            if (sizeObj.unknown) break;
+            const elemEnd = Math.min(segEnd, dataStart + sizeObj.size);
+            if (!opusTrack) {
+              opusTrack = parseWebmTrackEntries(buf, dataStart, elemEnd);
+              if (opusTrack) {
+                muxer = createOggOpusMuxer(buildOpusHead(opusTrack));
+                for (const dc of deferredClusters) {
+                  processWebmCluster(buf, dc.start, dc.limit, dc.unknown, opusTrack.trackNumber, muxer);
+                }
+                deferredClusters.length = 0;
+              }
+            }
+            sPos = elemEnd;
+          } else if (idObj.id === 0x1F43B675) { // Cluster
+            const clusterLimit = sizeObj.unknown ? segEnd : Math.min(segEnd, dataStart + sizeObj.size);
+            if (muxer && opusTrack) {
+              const nextPos = processWebmCluster(buf, dataStart, clusterLimit, sizeObj.unknown, opusTrack.trackNumber, muxer);
+              sPos = sizeObj.unknown ? nextPos : clusterLimit;
+            } else {
+              const nextPos = processWebmCluster(buf, dataStart, clusterLimit, sizeObj.unknown, -1, null);
+              deferredClusters.push({ start: dataStart, limit: sizeObj.unknown ? nextPos : clusterLimit, unknown: false });
+              sPos = sizeObj.unknown ? nextPos : clusterLimit;
+            }
+            clusterCounter++;
+            if (clusterCounter % 200 === 0) {
+              await new Promise(r => setTimeout(r, 0));
+            }
+          } else {
+            if (sizeObj.unknown) break;
+            sPos = Math.min(segEnd, dataStart + sizeObj.size);
+          }
+          if (sPos <= prevSPos) break;
+        }
+        pos = topSize.unknown ? sPos : segEnd;
+      } else {
+        if (topSize.unknown) break;
+        pos = Math.min(buf.length, topDataStart + topSize.size);
+      }
+      if (pos <= prevPos) break;
+    }
+
+    if (!muxer) return null;
+    return muxer.finish();
+  }
+
+  async function ensureOggAudioBlob(blob, options = {}) {
+    const filename = options.filename || '';
+    if (!blob || blob.size === 0) {
+      const ext = getAudioExtensionForBlob(blob, filename);
+      return { blob, ext, remuxed: false, formatLabel: getAudioFormatLabel(blob, ext, false) };
+    }
+
+    const container = await detectAudioContainer(blob);
+    if (container === 'ogg') {
+      const normalizedBlob = ((blob.type || '').trim().toLowerCase() === 'audio/ogg')
+        ? blob
+        : new Blob([blob], { type: 'audio/ogg' });
+      return {
+        blob: normalizedBlob,
+        ext: 'ogg',
+        remuxed: false,
+        formatLabel: getAudioFormatLabel(normalizedBlob, 'ogg', false)
+      };
+    }
+
+    if (container === 'webm') {
+      try {
+        const result = await remuxWebmOpusToOgg(blob);
+        if (result && result.blob && result.blob.size > 0) {
+          const verifiedContainer = await detectAudioContainer(result.blob);
+          if (verifiedContainer === 'ogg') {
+            return {
+              blob: result.blob,
+              ext: 'ogg',
+              remuxed: true,
+              durationSecs: result.durationSecs,
+              formatLabel: getAudioFormatLabel(result.blob, 'ogg', true)
+            };
+          }
+        }
+      } catch (err) {
+        console.warn('Remux WebM -> Ogg omitido; manteniendo contenedor original:', err);
+      }
+      const fallbackBlob = (blob.type && blob.type.trim()) ? blob : new Blob([blob], { type: 'audio/webm' });
+      return {
+        blob: fallbackBlob,
+        ext: 'webm',
+        remuxed: false,
+        formatLabel: getAudioFormatLabel(fallbackBlob, 'webm', false)
+      };
+    }
+
+    const ext = getAudioExtensionForBlob(blob, filename);
+    const typedBlob = (blob.type && blob.type.trim()) ? blob : new Blob([blob], { type: getMimeTypeForExtension(ext) });
+    return {
+      blob: typedBlob,
+      ext,
+      remuxed: false,
+      formatLabel: getAudioFormatLabel(typedBlob, ext, false)
+    };
+  }
+
+  // ============================================================================
   // 3. ESTADO GLOBAL, NOMBRADO INTELIGENTE DE ARCHIVOS Y ELEMENTOS DOM
   // ============================================================================
   let geminiKey = safeStorage.getItem(STORAGE_KEYS.API_KEY) || '';
@@ -692,6 +1424,8 @@
   let analyserBuffer = null;
 
   let currentLoadedItem = null;
+  let audioSessionGen = 0;
+  let activeRecordingId = 0;
   let markdownResult = '';
   let currentMeetingTopicSlug = '';
   let activeRecordingTimestampStr = '';
@@ -850,12 +1584,13 @@
     return slug ? `${slug}-reunion-${ts}.${extension}` : `reunion-${ts}.${extension}`;
   }
 
-  function triggerWebmDownload() {
-    if (!currentLoadedItem || currentLoadedItem.type !== 'audio') return;
+  function triggerAudioDownload() {
+    if (!currentLoadedItem || currentLoadedItem.type !== 'audio' || !currentLoadedItem.data) return;
+    const ext = currentLoadedItem.ext || getAudioExtensionForBlob(currentLoadedItem.data, currentLoadedItem.filename) || 'ogg';
     const url = URL.createObjectURL(currentLoadedItem.data);
     const a = document.createElement('a');
     a.href = url;
-    a.download = buildExportFilename('webm');
+    a.download = buildExportFilename(ext);
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   }
@@ -1142,7 +1877,13 @@
   };
 
   window.handleLogoutClick = async function() {
+    audioSessionGen++;
+    activeRecordingId++;
     await cleanupMediaResources();
+    btnStop.classList.add('hidden');
+    btnPause.classList.add('hidden');
+    btnStart.classList.remove('hidden');
+    captureModeSelector.disabled = false;
     safeStorage.removeItem(STORAGE_KEYS.API_KEY);
     geminiKey = '';
     appCard.classList.add('hidden');
@@ -1181,18 +1922,34 @@
         .catch(() => {});
     }
 
-    loadBackupFromDisk().then(recovered => {
+    const recoveryGen = ++audioSessionGen;
+    loadBackupFromDisk().then(async recovered => {
+      if (audioSessionGen !== recoveryGen || (mediaRecorder && mediaRecorder.state !== 'inactive')) return;
       if (recovered && Array.isArray(recovered.chunks) && recovered.chunks.length > 0) {
-        const blob = new Blob(recovered.chunks, { type: recovered.mimeType || 'audio/webm' });
-        if (blob.size > 0) {
+        const rawBlob = new Blob(recovered.chunks, { type: recovered.mimeType || 'audio/webm' });
+        if (rawBlob.size > 0) {
+          const prepared = await ensureOggAudioBlob(rawBlob);
+          if (audioSessionGen !== recoveryGen || (mediaRecorder && mediaRecorder.state !== 'inactive')) return;
+          const finalBlob = prepared.blob;
+          const ts = recovered.timestampStr || getFormattedTimestamp();
+          const duration = recovered.durationSecs || (prepared.durationSecs ? Math.round(prepared.durationSecs) : null);
+
+          if (prepared.remuxed) {
+            await saveFullBlobToDisk(finalBlob, finalBlob.type || 'audio/ogg', duration, ts);
+            if (audioSessionGen !== recoveryGen) return;
+          }
+
           currentLoadedItem = {
             type: 'audio',
-            data: blob,
-            durationSecs: recovered.durationSecs || null,
-            timestampStr: recovered.timestampStr || getFormattedTimestamp(),
+            data: finalBlob,
+            ext: prepared.ext,
+            remuxedFromWebm: prepared.remuxed,
+            formatLabel: prepared.formatLabel,
+            durationSecs: duration,
+            timestampStr: ts,
             pendingAutoDownload: false
           };
-          showRescueBox(blob, "Grabación recuperada automáticamente del disco local:");
+          showRescueBox(finalBlob, "Grabación recuperada automáticamente del disco local:", prepared);
         }
       }
     }).catch(() => {});
@@ -1238,9 +1995,10 @@
 
   function getSupportedMimeType() {
     const types = [
+      'audio/ogg;codecs=opus',
+      'audio/ogg',
       'audio/webm;codecs=opus',
       'audio/webm',
-      'audio/ogg;codecs=opus',
       'audio/mp4'
     ];
     for (const t of types) {
@@ -1333,39 +2091,94 @@
       audioChunks = [];
       currentMeetingTopicSlug = '';
       activeRecordingTimestampStr = getFormattedTimestamp();
+      audioSessionGen++;
+      const recId = ++activeRecordingId;
       await clearBackupFromDisk();
 
       const mimeType = getSupportedMimeType();
       const recorderOptions = { audioBitsPerSecond: 16000 };
       if (mimeType) recorderOptions.mimeType = mimeType;
 
-      mediaRecorder = new MediaRecorder(combinedStream, recorderOptions);
+      const activeRecorder = new MediaRecorder(combinedStream, recorderOptions);
+      mediaRecorder = activeRecorder;
 
-      mediaRecorder.ondataavailable = (e) => {
+      activeRecorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) {
           const chunkIdx = audioChunks.length;
           audioChunks.push(e.data);
-          saveChunkIncrementalToDisk(e.data, chunkIdx, mediaRecorder.mimeType, recordingElapsedSecs, activeRecordingTimestampStr);
+          saveChunkIncrementalToDisk(e.data, chunkIdx, activeRecorder.mimeType, recordingElapsedSecs, activeRecordingTimestampStr, recId);
         }
       };
 
-      mediaRecorder.onstop = async () => {
-        const finalMime = mediaRecorder.mimeType || 'audio/webm';
+      activeRecorder.onstop = async () => {
+        const finalMime = activeRecorder.mimeType || 'audio/webm';
         const stopTimestamp = getFormattedTimestamp();
-        const audioBlob = new Blob(audioChunks, { type: finalMime });
-        await saveFullBlobToDisk(audioBlob, finalMime, recordingElapsedSecs, stopTimestamp);
-        audioChunks = [];
-        await cleanupMediaResources();
+        const rawBlob = new Blob(audioChunks, { type: finalMime });
 
-        currentLoadedItem = {
-          type: 'audio',
-          data: audioBlob,
-          durationSecs: recordingElapsedSecs,
-          timestampStr: stopTimestamp,
-          pendingAutoDownload: true
-        };
-        showRescueBox(audioBlob, "Grabación protegida en disco local:");
-        processPipeline(currentLoadedItem);
+        btnStop.classList.add('hidden');
+        btnPause.classList.add('hidden');
+        btnStart.classList.remove('hidden');
+        captureModeSelector.disabled = false;
+        btnStart.disabled = true;
+        btnProcessFile.disabled = true;
+        btnRetryAi.disabled = true;
+
+        let launchedPipeline = false;
+        try {
+          if (rawBlob.size === 0) {
+            audioChunks = [];
+            if (geminiKey) {
+              showWarning("La grabación finalizó sin datos de audio capturados.");
+              updateStatus("Listo", 'idle');
+            }
+            return;
+          }
+
+          const rawContainer = await detectAudioContainer(rawBlob);
+          if (rawContainer === 'webm' && geminiKey) {
+            updateStatus("Empaquetando audio en formato Ogg/Opus...", 'idle');
+          }
+          const prepared = await ensureOggAudioBlob(rawBlob);
+          const audioBlob = prepared.blob;
+          const storedMime = audioBlob.type || finalMime;
+          const finalDurationSecs = recordingElapsedSecs || (prepared.durationSecs ? Math.round(prepared.durationSecs) : 0);
+
+          if (activeRecordingId === recId) {
+            activeRecordingId++;
+          }
+          await saveFullBlobToDisk(audioBlob, storedMime, finalDurationSecs, stopTimestamp);
+          audioChunks = [];
+
+          if (!geminiKey) return;
+
+          currentLoadedItem = {
+            type: 'audio',
+            data: audioBlob,
+            ext: prepared.ext,
+            remuxedFromWebm: prepared.remuxed,
+            formatLabel: prepared.formatLabel,
+            durationSecs: finalDurationSecs,
+            timestampStr: stopTimestamp,
+            pendingAutoDownload: true
+          };
+          showRescueBox(audioBlob, "Grabación protegida en disco local:", prepared);
+          launchedPipeline = true;
+          processPipeline(currentLoadedItem);
+        } catch (err) {
+          console.error('Error consolidando la grabación:', err);
+          if (geminiKey) {
+            showError("Error al finalizar la grabación: " + err.message);
+            updateStatus("Listo", 'idle');
+          }
+        } finally {
+          await cleanupMediaResources();
+          if (mediaRecorder === activeRecorder) mediaRecorder = null;
+          if (!launchedPipeline) {
+            btnStart.disabled = false;
+            btnProcessFile.disabled = false;
+            btnRetryAi.disabled = false;
+          }
+        }
       };
 
       mediaRecorder.start(5000);
@@ -1451,6 +2264,9 @@
       btnStop.classList.add('hidden');
       btnPause.classList.add('hidden');
       btnStart.classList.remove('hidden');
+      btnStart.disabled = true;
+      btnProcessFile.disabled = true;
+      btnRetryAi.disabled = true;
       captureModeSelector.disabled = false;
       updateStatus("Finalizando y consolidando audio...", 'idle');
       mediaRecorder.stop();
@@ -1461,13 +2277,14 @@
   // 8. CONVERSIÓN LIGERA A MP3 (16 kHz / 32 kbps) CON CONTROL DE MEMORIA
   // ============================================================================
   async function convertBlobToMp3(audioBlob, onProgress) {
+    const audioExt = getAudioExtensionForBlob(audioBlob) || 'ogg';
     if (typeof window.lamejs === 'undefined') {
-      throw new Error("La librería MP3 (lamejs) no está cargada. Comprueba tu conexión o descarga el original en .webm.");
+      throw new Error(`La librería MP3 (lamejs) no está cargada. Comprueba tu conexión o descarga el audio directamente en .${audioExt}.`);
     }
 
     const sizeMb = audioBlob.size / (1024 * 1024);
     if (sizeMb > 20) {
-      const ok = confirm(`El archivo de audio pesa ${sizeMb.toFixed(1)} MB (reunión muy larga). La conversión a MP3 en el navegador puede consumir bastante memoria RAM. ¿Deseas continuar o prefieres cancelar y descargar el archivo .webm original directamente?`);
+      const ok = confirm(`El archivo de audio pesa ${sizeMb.toFixed(1)} MB (reunión muy larga). La conversión a MP3 en el navegador puede consumir bastante memoria RAM. ¿Deseas continuar o prefieres cancelar y descargar el archivo .${audioExt} directamente?`);
       if (!ok) throw new Error("Conversión cancelada por el usuario.");
     }
 
@@ -1517,14 +2334,15 @@
   }
 
   btnDownloadMp3.addEventListener('click', async () => {
-    if (!currentLoadedItem || currentLoadedItem.type !== 'audio') return;
+    const activeItem = currentLoadedItem;
+    if (!activeItem || activeItem.type !== 'audio' || !activeItem.data) return;
     showError(null);
     const originalText = btnDownloadMp3.innerText;
     btnDownloadMp3.disabled = true;
     btnDownloadMp3.innerText = "Decodificando...";
 
     try {
-      const mp3Blob = await convertBlobToMp3(currentLoadedItem.data, (pct) => {
+      const mp3Blob = await convertBlobToMp3(activeItem.data, (pct) => {
         btnDownloadMp3.innerText = `Convirtiendo (${pct}%)...`;
       });
       const url = URL.createObjectURL(mp3Blob);
@@ -1537,7 +2355,8 @@
     } catch (err) {
       console.error(err);
       if (!err.message.includes('cancelada')) {
-        showError("No se pudo convertir a MP3: " + err.message + " Descarga el archivo original (.webm).");
+        const audioExt = activeItem.ext || getAudioExtensionForBlob(activeItem.data, activeItem.filename) || 'ogg';
+        showError(`No se pudo convertir a MP3: ${err.message} Descarga el archivo .${audioExt} directamente.`);
       }
     } finally {
       btnDownloadMp3.disabled = false;
@@ -1546,7 +2365,7 @@
   });
 
   btnDownloadAudio.addEventListener('click', () => {
-    triggerWebmDownload();
+    triggerAudioDownload();
   });
 
   // ============================================================================
@@ -1565,42 +2384,82 @@
   }
 
   btnProcessFile.addEventListener('click', async () => {
+    if (btnProcessFile.disabled) return;
     showError(null);
     showWarning(null);
     const file = fileInput.files[0];
     if (!file) return showError("Selecciona primero un archivo.");
 
-    const ext = file.name.split('.').pop().toLowerCase();
-    const isTextFile = ['txt', 'md', 'csv'].includes(ext) || file.type.startsWith('text/');
+    const ext = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : '';
+    const isTextFile = ['txt', 'md', 'csv'].includes(ext) || (file.type || '').startsWith('text/');
     const uploadTimestamp = getFormattedTimestamp();
 
-    if (isTextFile) {
-      updateStatus("Leyendo y optimizando archivo de transcripción...", 'idle');
-      const rawContent = await file.text();
-      const textContent = cleanTranscriptText(rawContent, ext === 'csv');
-      if (!textContent.trim()) {
-        updateStatus("Listo", 'idle');
-        return showError("El archivo de texto o CSV seleccionado está vacío.");
+    audioSessionGen++;
+    btnStart.disabled = true;
+    btnRetryAi.disabled = true;
+    btnProcessFile.disabled = true;
+
+    let launchedPipeline = false;
+    try {
+      if (isTextFile) {
+        updateStatus("Leyendo y optimizando archivo de transcripción...", 'idle');
+        const rawContent = await file.text();
+        const textContent = cleanTranscriptText(rawContent, ext === 'csv');
+        if (!textContent.trim()) {
+          updateStatus("Listo", 'idle');
+          showError("El archivo de texto o CSV seleccionado está vacío.");
+          return;
+        }
+        currentLoadedItem = {
+          type: 'text',
+          data: textContent,
+          filename: file.name,
+          size: file.size,
+          timestampStr: uploadTimestamp,
+          pendingAutoDownload: false
+        };
+        launchedPipeline = true;
+        processPipeline(currentLoadedItem);
+      } else {
+        if (file.size === 0) {
+          updateStatus("Listo", 'idle');
+          showError("El archivo de audio seleccionado está vacío.");
+          return;
+        }
+        const container = await detectAudioContainer(file);
+        if (container === 'webm') {
+          updateStatus("Empaquetando archivo .webm a formato Ogg/Opus sin recodificar...", 'idle');
+        }
+        const prepared = await ensureOggAudioBlob(file, { filename: file.name });
+        const finalAudioBlob = prepared.blob;
+        currentLoadedItem = {
+          type: 'audio',
+          data: finalAudioBlob,
+          filename: file.name,
+          ext: prepared.ext,
+          remuxedFromWebm: prepared.remuxed,
+          formatLabel: prepared.formatLabel,
+          durationSecs: prepared.durationSecs ? Math.round(prepared.durationSecs) : null,
+          timestampStr: uploadTimestamp,
+          pendingAutoDownload: false
+        };
+        const boxTitle = prepared.remuxed
+          ? "Archivo .webm convertido a Ogg/Opus (.ogg):"
+          : "Archivo de audio externo cargado:";
+        showRescueBox(finalAudioBlob, boxTitle, prepared);
+        launchedPipeline = true;
+        processPipeline(currentLoadedItem);
       }
-      currentLoadedItem = {
-        type: 'text',
-        data: textContent,
-        filename: file.name,
-        size: file.size,
-        timestampStr: uploadTimestamp,
-        pendingAutoDownload: false
-      };
-      processPipeline(currentLoadedItem);
-    } else {
-      currentLoadedItem = {
-        type: 'audio',
-        data: file,
-        durationSecs: null,
-        timestampStr: uploadTimestamp,
-        pendingAutoDownload: false
-      };
-      showRescueBox(file, "Archivo de audio externo cargado:");
-      processPipeline(currentLoadedItem);
+    } catch (err) {
+      console.error('Error al cargar el archivo externo:', err);
+      showError("No se pudo procesar el archivo seleccionado: " + err.message);
+      updateStatus("Listo", 'idle');
+    } finally {
+      if (!launchedPipeline) {
+        btnStart.disabled = false;
+        btnRetryAi.disabled = false;
+        btnProcessFile.disabled = false;
+      }
     }
   });
 
@@ -1609,16 +2468,26 @@
   });
 
   btnClearRescue.addEventListener('click', async () => {
+    audioSessionGen++;
     await clearBackupFromDisk();
     currentLoadedItem = null;
     currentMeetingTopicSlug = '';
     rescueBox.classList.add('hidden');
   });
 
-  function showRescueBox(blob, titleText) {
+  function showRescueBox(blob, titleText, meta = null) {
     const sizeMb = (blob.size / (1024 * 1024)).toFixed(2);
+    const ext = (meta && meta.ext)
+      || (currentLoadedItem && currentLoadedItem.ext)
+      || getAudioExtensionForBlob(blob, currentLoadedItem && currentLoadedItem.filename)
+      || 'ogg';
+    const formatLabel = (meta && meta.formatLabel)
+      || getAudioFormatLabel(blob, ext, !!(meta && meta.remuxed));
     rescueTitle.innerText = titleText || "Grabación protegida en disco local:";
-    rescueInfo.innerText = `Tamaño: ${sizeMb} MB | Formato original: ${blob.type || 'audio/webm'}`;
+    rescueInfo.innerText = `Tamaño: ${sizeMb} MB | Formato: ${formatLabel}`;
+    btnDownloadAudio.innerText = ext === 'ogg'
+      ? 'Descargar Audio (.ogg)'
+      : `Descargar Original (.${ext})`;
     rescueBox.classList.remove('hidden');
   }
 
@@ -1696,11 +2565,11 @@
       showError("Error en el procesamiento: " + err.message + " (Tu grabación sigue protegida para descargar o reintentar).");
       updateStatus("Fallo en el procesamiento", 'idle');
     } finally {
-      // Ejecutar autodescarga posprocesado del .webm si procede (incluso si falló la red/API)
+      // Ejecutar autodescarga posprocesado del audio (.ogg) si procede (incluso si falló la red/API)
       if (item && item.type === 'audio' && item.pendingAutoDownload === true) {
         item.pendingAutoDownload = false;
         if (chkAutoDownloadWebm && chkAutoDownloadWebm.checked) {
-          triggerWebmDownload();
+          triggerAudioDownload();
         }
       }
 
@@ -1785,6 +2654,7 @@
 
   async function uploadAudioToGeminiFilesApi(audioBlob, cleanMimeType) {
     updateStatus("Subiendo archivo extenso mediante Gemini Files API...", 'idle');
+    const fileExt = getAudioExtensionForBlob(audioBlob, currentLoadedItem && currentLoadedItem.filename) || 'ogg';
 
     const initRes = await fetch(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${encodeURIComponent(geminiKey)}`, {
       method: 'POST',
@@ -1795,7 +2665,7 @@
         'X-Goog-Upload-Header-Content-Type': cleanMimeType,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ file: { display_name: `reunion_${Date.now()}` } })
+      body: JSON.stringify({ file: { display_name: `reunion_${Date.now()}.${fileExt}` } })
     });
 
     if (!initRes.ok) {
@@ -1845,7 +2715,7 @@
   }
 
   async function processAudioWithGemini(audioBlob, model) {
-    const cleanMimeType = (audioBlob.type || 'audio/webm').split(';')[0];
+    const cleanMimeType = (audioBlob.type || 'audio/ogg').split(';')[0].trim();
     const isOverInlineLimit = audioBlob.size > 14.5 * 1024 * 1024;
 
     let audioPart = null;
